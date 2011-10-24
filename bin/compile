@@ -38,7 +38,7 @@ export PATH=$GRAILS_HOME/bin:$PATH
 cd $BUILD_DIR
 
 # build app
-BUILDCMD="grails war"
+BUILDCMD="grails -Divy.default.ivy.user.dir=$CACHE_DIR war"
 echo "-----> executing $BUILDCMD"
 
 $BUILDCMD 2>&1 | sed -u 's/^/       /'
