@@ -8,6 +8,7 @@ BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
 # parse args
 BUILD_DIR=$1
 CACHE_DIR=$2
+GRAILS_VERSION="1.3.7"
 
 if [ ! -d $CACHE_DIR ] ; then
   mkdir $CACHE_DIR
@@ -16,18 +17,22 @@ fi
 cd $CACHE_DIR
 
 # install grails
-GRAILS_URL="http://lang-pack-grails.s3.amazonaws.com/grails-1.3.7.tar.gz"
+GRAILS_URL="http://lang-pack-grails.s3.amazonaws.com/grails-$GRAILS_VERSION.tar.gz"
 
-if [ ! -d .grails ]; then
-  echo -n "-----> Installing Grails 1.3.7....."
+if [ ! -d "grails-$GRAILS_VERSION" ]; then
+  echo -n "-----> Installing Grails $GRAILS_VERSION....."
 #  curl --silent --max-time 60 --location $GRAILS_URL | tar xz
   curl --silent --location $GRAILS_URL | tar xz
-  mv grails-1.3.7 .grails
   echo " done"
 fi
 
-export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-export GRAILS_HOME=$CACHE_DIR/.grails
+# This is a simplisitic way to only set JAVA_HOME when on Cedar. If you run this 
+# script locally and your jdk is not in this location, you're responsible for
+# setting it yourself. Need to find a smarter way of conditionally setting this var
+if [ -d /usr/lib/jvm/java-6-openjdk ] ; then
+    export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+fi
+export GRAILS_HOME=$CACHE_DIR/grails-$GRAILS_VERSION
 export PATH=$GRAILS_HOME/bin:$PATH
 
 cd $BUILD_DIR
@@ -45,7 +50,6 @@ fi
 
 if [ ! -d server ] ; then
     echo "-----> No server directory found. Adding jetty-runner 7.5.0.v20110901 automatically."
-    echo "       To use your own server, read http://devcenter.heroku.com/articles/grails-custom-server."
     mkdir server
     cp $GRAILS_HOME/jetty-runner-7.5.0.v20110901.jar server/jetty-runner.jar
 fi
