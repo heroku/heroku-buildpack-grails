@@ -9,6 +9,14 @@ BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
 BUILD_DIR=$1
 CACHE_DIR=$2
 
+check_build_status()
+{
+  if [ "${PIPESTATUS[*]}" != "0 0" ]; then
+    echo " !     Failed to build app"
+    exit 1
+  fi
+}
+
 if [ ! -f $BUILD_DIR/application.properties ] ; then
     echo "-----> application.properties not found. This file is required. Build failed."
     echo " !     Failed to build app"
@@ -57,17 +65,18 @@ cd $BUILD_DIR
 if [ "$GRAILS_VERSION" = "2.0.0.RC1" ] ; then
     BUILDCMD_OPT="-plain-output"
 fi
-BUILDCMD="grails $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war"
 
-echo "-----> executing $BUILDCMD"
-
-grails -Divy.default.ivy.user.dir=$CACHE_DIR compile
-$BUILDCMD 2>&1 | sed -u 's/^/       /'
-
-if [ "${PIPESTATUS[*]}" != "0 0" ]; then
-  echo " !     Failed to build app"
-  exit 1
+if [ "$GRAILS_VERSION" == "1.3.7" ] ; then
+    COMPILECMD="grails -Divy.default.ivy.user.dir=$CACHE_DIR compile"
+    echo "-----> executing $COMPILECMD"
+    eval "$COMPILECMD" | sed -u 's/^/       /'
+    check_build_status
 fi
+
+BUILDCMD="grails $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war"
+echo "-----> executing $BUILDCMD"
+eval "$BUILDCMD" | sed -u 's/^/       /'
+check_build_status
 
 if [ ! -d server ] ; then
     echo "-----> No server directory found. Adding jetty-runner 7.5.0.v20110901 automatically."
