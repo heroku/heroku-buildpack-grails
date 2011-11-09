@@ -61,6 +61,7 @@ BUILDCMD="grails $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war"
 
 echo "-----> executing $BUILDCMD"
 
+grails -Divy.default.ivy.user.dir=$CACHE_DIR compile
 $BUILDCMD 2>&1 | sed -u 's/^/       /'
 
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
