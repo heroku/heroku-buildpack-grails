@@ -15,7 +15,7 @@ if [ ! -f $BUILD_DIR/application.properties ] ; then
     exit 1
 fi
     
-GRAILS_VERSION=`grep app.grails.version $BUILD_DIR/application.properties | sed -e 's/app.grails.version=\(.*\)$/\1/g'`
+GRAILS_VERSION=`grep app\.grails\.version $BUILD_DIR/application.properties | sed -E -e 's/app\.grails\.version[ \t]*=[ \t]*([^ \t]+)[ \t]*$/\1/g'`
 
 echo "-----> Grails $GRAILS_VERSION app detected"
 
