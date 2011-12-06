@@ -41,7 +41,7 @@ fi
 cd $CACHE_DIR
 
 # install grails
-GRAILS_URL="http://lang-pack-grails.s3.amazonaws.com/grails-$GRAILS_VERSION.tar.gz"
+GRAILS_URL="http://heroku-jvm-buildpack-grails.s3.amazonaws.com/grails-$GRAILS_VERSION.tar.gz"
 
 if [ ! -d "grails-$GRAILS_VERSION" ]; then
   echo -n "-----> Installing Grails $GRAILS_VERSION....."
