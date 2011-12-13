@@ -17,6 +17,32 @@ check_build_status()
   fi
 }
 
+install_grails()
+{
+  VER_TO_INSTALL=$1
+  GRAILS_URL="http://s3.amazonaws.com/heroku-jvm-buildpack-grails/grails-$VER_TO_INSTALL.tar.gz"
+
+  GRAILS_TAR_FILE="grails-heroku.tar.gz"
+  echo "-----> Installing Grails $VER_TO_INSTALL....."
+  curl --silent --max-time 150 --location $GRAILS_URL -o $GRAILS_TAR_FILE
+
+  # Error checking
+  if [ ! -f $GRAILS_TAR_FILE ]; then
+    echo "-----> Error downloading Grails framework. Please try again..."
+    exit 1
+  fi
+  if [ -z "`file $GRAILS_TAR_FILE | grep gzip`" ]; then
+    echo "-----> Error installing Grails framework or unsupported Grails framework version specified. Please review Dev Center for a list of supported versions."
+    exit 1
+  fi
+
+  tar xzf $GRAILS_TAR_FILE
+  rm $GRAILS_TAR_FILE
+
+  mv grails-$VER_TO_INSTALL .grails
+  echo "-----> done"
+}
+
 if [ ! -f $BUILD_DIR/application.properties ] ; then
     echo "-----> application.properties not found. This file is required. Build failed."
     echo " !     Failed to build app"
@@ -27,13 +53,6 @@ GRAILS_VERSION=`grep app\.grails\.version $BUILD_DIR/application.properties | se
 
 echo "-----> Grails $GRAILS_VERSION app detected"
 
-if [ ! "$GRAILS_VERSION" == "1.3.7" ] && [ ! "$GRAILS_VERSION" == "2.0.0.RC1" ] && [ ! "$GRAILS_VERSION" == "2.0.0.RC3" ]; then
-    echo "-----> Grails version $GRAILS_VERSION not supported."
-    echo "       Only Grails 1.3.7, 2.0.0.RC1, and 2.0.0.RC3 are currently supported"
-    echo " !     Failed to build app"
-    exit 1
-fi
-
 if [ ! -d $CACHE_DIR ] ; then
   mkdir $CACHE_DIR
 fi
@@ -43,10 +62,8 @@ cd $CACHE_DIR
 # install grails
 GRAILS_URL="http://s3.amazonaws.com/heroku-jvm-buildpack-grails/grails-$GRAILS_VERSION.tar.gz"
 
-if [ ! -d "grails-$GRAILS_VERSION" ]; then
-  echo -n "-----> Installing Grails $GRAILS_VERSION....."
-  curl --silent --max-time 60 --location $GRAILS_URL | tar xz
-  echo " done"
+if [ ! -d ".grails" ]; then
+  install_grails $GRAILS_VERSION 
 fi
 
 # This is a simplisitic way to only set JAVA_HOME when on Cedar. If you run this 
