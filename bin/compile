@@ -42,7 +42,9 @@ install_grails()
   rm $GRAILS_TAR_FILE
 
   #temporary step for testing will be removed on deploy when updated grails tar files can be uploaded
-  mv grails-$VER_TO_INSTALL $GRAILS_DIR
+  if [ -d grails-$VER_TO_INSTALL ] ; then
+    mv grails-$VER_TO_INSTALL $GRAILS_DIR
+  fi
   echo "-----> Done"
 }
 
