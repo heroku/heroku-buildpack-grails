@@ -9,6 +9,8 @@ BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
 BUILD_DIR=$1
 CACHE_DIR=$2
 
+GRAILS_DIR=".grails"
+
 check_build_status()
 {
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
@@ -39,7 +41,7 @@ install_grails()
   tar xzf $GRAILS_TAR_FILE
   rm $GRAILS_TAR_FILE
 
-  mv grails-$VER_TO_INSTALL .grails
+  mv grails-$VER_TO_INSTALL $GRAILS_DIR
   echo "-----> done"
 }
 
@@ -62,8 +64,15 @@ cd $CACHE_DIR
 # install grails
 GRAILS_URL="http://s3.amazonaws.com/heroku-jvm-buildpack-grails/grails-$GRAILS_VERSION.tar.gz"
 
-if [ ! -d ".grails" ]; then
-  install_grails $GRAILS_VERSION 
+if [ ! -d $GRAILS_DIR ]; then
+  install_grails $GRAILS_VERSION
+else
+  INSTALLED_GRAILS_VERSION=`grep grails\.version $GRAILS_DIR/build.properties | sed -E -e 's/grails\.version[ \t]*=[ \t]*([^ \t]+)[ \t]*$/\1/g'`
+  if [ "$INSTALLED_GRAILS_VERSION" != "$GRAILS_VERSION" ] ; then
+    echo "-----> Updating Grails version. Previous version was $INSTALLED_GRAILS_VERSION. Updating to $GRAILS_VERSION..."
+    rm -rf $GRAILS_DIR
+    install_grails $GRAILS_VERSION
+  fi
 fi
 
 # This is a simplisitic way to only set JAVA_HOME when on Cedar. If you run this 
@@ -72,7 +81,7 @@ fi
 if [ -d /usr/lib/jvm/java-6-openjdk ] ; then
     export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
 fi
-export GRAILS_HOME=$CACHE_DIR/.grails
+export GRAILS_HOME=$CACHE_DIR/$GRAILS_DIR
 export PATH=$GRAILS_HOME/bin:$PATH
 
 cd $BUILD_DIR
