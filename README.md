@@ -52,11 +52,11 @@ Push the app to Heroku
 
 ### Auto-detection
 
-Heroku auto-detects Grails apps by the existence of `application.properties` in the project root. The presence of this file will trigger Heroku to build the app using this build pack (git@github.com/heroku/heroku-buildpack-grails.git).
+Heroku auto-detects Grails apps by the existence of the `grails-app` directory in the project root and the `application.properties`  file is also expected to exist in the root directory. 
 
 ### Using a Customized (Forked) Build Pack
 
-You can fork this repo and tell Heroku to use the forked version by passing the `--buildpack` option to `heroku create`:
+This is the default buildpack repository for Grails. You can fork this repo and tell Heroku to use the forked version by passing the `--buildpack` option to `heroku create`:
 
   $ heroku create --stack cedar --buildpack http://github.com/jesperfj/heroku-buildpack-grails.git
 
