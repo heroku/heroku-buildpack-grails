@@ -1,6 +1,6 @@
 # Heroku buildpack: Grails
 
-This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpack) for building and deploying Grails apps on Heroku.
+This is a Heroku buildpack for building and deploying Grails apps on Heroku.
 
 ## Usage
 
