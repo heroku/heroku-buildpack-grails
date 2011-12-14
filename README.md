@@ -10,7 +10,7 @@ Create a Git repository for a Grails 1.3.7 or 2.0 app:
     $ ls
     application.properties    lib        src               target    web-app
     grails-app                scripts    stacktrace.log    test
-    $ git integrate-with --git
+    $ grails integrate-with --git
     | Created Git project files..
     $ git init
     Initialized empty Git repository in /Users/jjoergensen/mygrailsapp/.git/
