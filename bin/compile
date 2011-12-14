@@ -42,11 +42,11 @@ install_grails()
   rm $GRAILS_TAR_FILE
 
   mv grails-$VER_TO_INSTALL $GRAILS_DIR
-  echo "-----> done"
+  echo "-----> Done"
 }
 
 if [ ! -f $BUILD_DIR/application.properties ] ; then
-    echo "-----> application.properties not found. This file is required. Build failed."
+    echo "-----> File not found: application.properties. This file is required. Build failed."
     echo " !     Failed to build app"
     exit 1
 fi
@@ -54,10 +54,6 @@ fi
 GRAILS_VERSION=`grep app\.grails\.version $BUILD_DIR/application.properties | sed -E -e 's/app\.grails\.version[ \t]*=[ \t]*([^ \t]+)[ \t]*$/\1/g'`
 
 echo "-----> Grails $GRAILS_VERSION app detected"
-
-if [ ! -d $CACHE_DIR ] ; then
-  mkdir $CACHE_DIR
-fi
 
 cd $CACHE_DIR
 
@@ -91,13 +87,13 @@ if [ ! "$GRAILS_VERSION" == "1.3.7" ] ; then
     BUILDCMD_OPT="-plain-output"
 else
     COMPILECMD="grails -Divy.default.ivy.user.dir=$CACHE_DIR compile"
-    echo "-----> executing $COMPILECMD"
+    echo "-----> Executing $COMPILECMD"
     eval "$COMPILECMD" | sed -u 's/^/       /'
     check_build_status
 fi
 
 BUILDCMD="grails $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war"
-echo "-----> executing $BUILDCMD"
+echo "-----> Executing $BUILDCMD"
 eval "$BUILDCMD" | sed -u 's/^/       /'
 check_build_status
 
