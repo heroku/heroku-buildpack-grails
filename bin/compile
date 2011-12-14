@@ -84,7 +84,7 @@ export PATH=$GRAILS_HOME/bin:$PATH
 cd $BUILD_DIR
 
 # build app
-if [ ! "$GRAILS_VERSION" == "1.3.7" ] ; then
+if [ "$GRAILS_VERSION" != "1.3.7" ] ; then
     BUILDCMD_OPT="-plain-output"
 else
     COMPILECMD="grails -Divy.default.ivy.user.dir=$CACHE_DIR compile"
