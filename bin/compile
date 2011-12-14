@@ -72,7 +72,7 @@ fi
 if [ -d /usr/lib/jvm/java-6-openjdk ] ; then
     export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
 fi
-export GRAILS_HOME=$CACHE_DIR/grails-$GRAILS_VERSION
+export GRAILS_HOME=$CACHE_DIR/.grails
 export PATH=$GRAILS_HOME/bin:$PATH
 
 cd $BUILD_DIR
