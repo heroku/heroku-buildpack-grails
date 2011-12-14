@@ -56,6 +56,10 @@ GRAILS_VERSION=`grep app\.grails\.version $BUILD_DIR/application.properties | se
 
 echo "-----> Grails $GRAILS_VERSION app detected"
 
+if [ ! -d $CACHE_DIR ] ; then
+  mkdir $CACHE_DIR
+fi
+
 cd $CACHE_DIR
 
 # install grails
