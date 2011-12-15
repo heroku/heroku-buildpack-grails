@@ -41,10 +41,6 @@ install_grails()
   tar xzf $GRAILS_TAR_FILE
   rm $GRAILS_TAR_FILE
 
-  #temporary step for testing will be removed on deploy when updated grails tar files can be uploaded
-  if [ -d grails-$VER_TO_INSTALL ] ; then
-    mv grails-$VER_TO_INSTALL $GRAILS_DIR
-  fi
   echo "-----> Done"
 }
 
