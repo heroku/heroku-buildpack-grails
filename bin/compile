@@ -9,6 +9,8 @@ BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
 BUILD_DIR=$1
 CACHE_DIR=$2
 
+GRAILS_DIR=".grails"
+
 check_build_status()
 {
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
@@ -17,8 +19,33 @@ check_build_status()
   fi
 }
 
+install_grails()
+{
+  VER_TO_INSTALL=$1
+  GRAILS_URL="http://s3.amazonaws.com/heroku-jvm-buildpack-grails/grails-$VER_TO_INSTALL.tar.gz"
+
+  GRAILS_TAR_FILE="grails-heroku.tar.gz"
+  echo "-----> Installing Grails $VER_TO_INSTALL....."
+  curl --silent --max-time 150 --location $GRAILS_URL -o $GRAILS_TAR_FILE
+
+  # Error checking
+  if [ ! -f $GRAILS_TAR_FILE ]; then
+    echo "-----> Error downloading Grails framework. Please try again..."
+    exit 1
+  fi
+  if [ -z "`file $GRAILS_TAR_FILE | grep gzip`" ]; then
+    echo "-----> Error installing Grails framework or unsupported Grails framework version specified. Please review Dev Center for a list of supported versions."
+    exit 1
+  fi
+
+  tar xzf $GRAILS_TAR_FILE
+  rm $GRAILS_TAR_FILE
+
+  echo "-----> Done"
+}
+
 if [ ! -f $BUILD_DIR/application.properties ] ; then
-    echo "-----> application.properties not found. This file is required. Build failed."
+    echo "-----> File not found: application.properties. This file is required. Build failed."
     echo " !     Failed to build app"
     exit 1
 fi
@@ -26,13 +53,6 @@ fi
 GRAILS_VERSION=`grep app\.grails\.version $BUILD_DIR/application.properties | sed -E -e 's/app\.grails\.version[ \t]*=[ \t]*([^ \t]+)[ \t]*$/\1/g'`
 
 echo "-----> Grails $GRAILS_VERSION app detected"
-
-if [ ! "$GRAILS_VERSION" == "1.3.7" ] && [ ! "$GRAILS_VERSION" == "2.0.0.RC1" ] && [ ! "$GRAILS_VERSION" == "2.0.0.RC3" ]; then
-    echo "-----> Grails version $GRAILS_VERSION not supported."
-    echo "       Only Grails 1.3.7, 2.0.0.RC1, and 2.0.0.RC3 are currently supported"
-    echo " !     Failed to build app"
-    exit 1
-fi
 
 if [ ! -d $CACHE_DIR ] ; then
   mkdir $CACHE_DIR
@@ -43,10 +63,15 @@ cd $CACHE_DIR
 # install grails
 GRAILS_URL="http://s3.amazonaws.com/heroku-jvm-buildpack-grails/grails-$GRAILS_VERSION.tar.gz"
 
-if [ ! -d "grails-$GRAILS_VERSION" ]; then
-  echo -n "-----> Installing Grails $GRAILS_VERSION....."
-  curl --silent --max-time 60 --location $GRAILS_URL | tar xz
-  echo " done"
+if [ ! -d $GRAILS_DIR ]; then
+  install_grails $GRAILS_VERSION
+else
+  INSTALLED_GRAILS_VERSION=`grep '^grails\.version' $GRAILS_DIR/build.properties | sed -E -e 's/grails\.version[ \t]*=[ \t]*([^ \t]+)[ \t]*$/\1/g'`
+  if [ "$INSTALLED_GRAILS_VERSION" != "$GRAILS_VERSION" ] ; then
+    echo "-----> Updating Grails version. Previous version was $INSTALLED_GRAILS_VERSION. Updating to $GRAILS_VERSION..."
+    rm -rf $GRAILS_DIR
+    install_grails $GRAILS_VERSION
+  fi
 fi
 
 # This is a simplisitic way to only set JAVA_HOME when on Cedar. If you run this 
@@ -55,23 +80,23 @@ fi
 if [ -d /usr/lib/jvm/java-6-openjdk ] ; then
     export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
 fi
-export GRAILS_HOME=$CACHE_DIR/grails-$GRAILS_VERSION
+export GRAILS_HOME=$CACHE_DIR/$GRAILS_DIR
 export PATH=$GRAILS_HOME/bin:$PATH
 
 cd $BUILD_DIR
 
 # build app
-if [ ! "$GRAILS_VERSION" == "1.3.7" ] ; then
+if [ "$GRAILS_VERSION" != "1.3.7" ] ; then
     BUILDCMD_OPT="-plain-output"
 else
     COMPILECMD="grails -Divy.default.ivy.user.dir=$CACHE_DIR compile"
-    echo "-----> executing $COMPILECMD"
+    echo "-----> Executing $COMPILECMD"
     eval "$COMPILECMD" | sed -u 's/^/       /'
     check_build_status
 fi
 
 BUILDCMD="grails $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war"
-echo "-----> executing $BUILDCMD"
+echo "-----> Executing $BUILDCMD"
 eval "$BUILDCMD" | sed -u 's/^/       /'
 check_build_status
 
