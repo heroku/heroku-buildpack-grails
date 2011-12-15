@@ -58,6 +58,6 @@ Heroku auto-detects Grails apps by the existence of the `grails-app` directory i
 
 This is the default buildpack repository for Grails. You can fork this repo and tell Heroku to use the forked version by passing the `--buildpack` option to `heroku create`:
 
-  $ heroku create --stack cedar --buildpack http://github.com/jesperfj/heroku-buildpack-grails.git
+    $ heroku create --stack cedar --buildpack http://github.com/jesperfj/heroku-buildpack-grails.git
 
 
