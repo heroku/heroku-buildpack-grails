@@ -30,6 +30,7 @@ createGrailsApp()
   ${BUILDPACK_TEST_RUNNER_HOME}/lib/magic_curl/bin/curl --silent --max-time 150 --location $GRAILS_URL | tar xz
   
   cd ${BUILD_DIR}/..
+  [ -z "${JAVA_HOME}" ] && export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
   .grails/bin/grails create-app $(basename ${BUILD_DIR}) >/dev/null
   
   cd ${pwd}
