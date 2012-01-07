@@ -61,8 +61,6 @@ fi
 cd $CACHE_DIR
 
 # install grails
-GRAILS_URL="http://s3.amazonaws.com/heroku-jvm-buildpack-grails/grails-$GRAILS_VERSION.tar.gz"
-
 if [ ! -d $GRAILS_DIR ]; then
   install_grails $GRAILS_VERSION
 else
@@ -101,11 +99,13 @@ eval "$BUILDCMD" | sed -u 's/^/       /'
 check_build_status
 
 if [ ! -d server ] ; then
-    echo "-----> No server directory found. Adding jetty-runner 7.5.4.v20111024 automatically."
+    JETTY_RUNNER_VERSION=7.5.4.v20111024
+
+    echo "-----> No server directory found. Adding jetty-runner $JETTY_RUNNER_VERSION automatically."
     mkdir server
-    cp $GRAILS_HOME/jetty-runner-7.5.4.v20111024.jar server/jetty-runner.jar
-    echo 'vendored:7.5.4.v20111024' > server/jettyVersion
-    echo 'vendored:7.5.4.v20111024' > $CACHE_DIR/jettyVersion
+    cp $GRAILS_HOME/jetty-runner-$JETTY_RUNNER_VERSION.jar server/jetty-runner.jar
+    echo "vendored:$JETTY_RUNNER_VERSION" > server/jettyVersion
+    echo "vendored:$JETTY_RUNNER_VERSION" > $CACHE_DIR/jettyVersion
 fi
 
 
