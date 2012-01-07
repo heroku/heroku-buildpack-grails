@@ -38,18 +38,36 @@ createGrailsApp()
 
 testCompile()
 {
-  createGrailsApp "1.3.7"
+  GRAILS_VERSION="1.3.7"
+  JETTY_RUNNER_VERSION="7.5.4.v20111024"
+
+  createGrailsApp ${GRAILS_VERSION}
+  assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
+  assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
+  assertFalse "Precondition: Jetty Runner should not be installed" "[ -d ${BUILD_DIR}/server ]"
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
   assertEquals 0 "${rtrn}"
   assertEquals "" "$(cat ${STD_ERR})"
+
+  assertFileContains "Grails ${GRAILS_VERSION} app detected" "${STD_OUT}"
+  assertFileContains "Installing Grails ${GRAILS_VERSION}" "${STD_OUT}"
+  assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
+  assertFileContains "Grails 1.3.7 should pre-compile" "grails -Divy.default.ivy.user.dir=${CACHE_DIR} compile" "${STD_OUT}"
+  assertFileContains "Grails 1.3.7 should not specify -plain-output flag" "grails  -Divy.default.ivy.user.dir=${CACHE_DIR} war" "${STD_OUT}"
+  
+  assertFileContains "No server directory found. Adding jetty-runner ${JETTY_RUNNER_VERSION} automatically." "${STD_OUT}"
+  assertTrue "server dir should exist" "[ -d ${BUILD_DIR}/server ]"
+  assertTrue "Jetty Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/jetty-runner.jar ]"
+  assertEquals "vendored:${JETTY_RUNNER_VERSION}" "$(cat ${BUILD_DIR}/server/jettyVersion)"
+  assertEquals "vendored:${JETTY_RUNNER_VERSION}" "$(cat ${CACHE_DIR}/jettyVersion)"
 }
 
 testCompliationFailsWhenApplicationPropertiesIsMissing()
 {
-  createGrailsApp "1.3.7" 
-  
-  rm ${BUILD_DIR}/application.properties
+  mkdir -p ${BUILD_DIR}/grails-app
+
+  assertFalse "Precondition: application.properties should not exist" "[ -f ${BUILD_DIR}/application.properties ]"
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
   assertEquals 1 "${rtrn}"
