@@ -69,7 +69,7 @@ testCompile_Version_1_3_7()
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${rtrn}"
+  assertEquals 0 "${RETURN}"
   assertEquals "" "$(cat ${STD_ERR})"
 
   assertFileContains "Grails ${grailsVersion} app detected" "${STD_OUT}"
@@ -88,7 +88,7 @@ testCompile_Version_2_0_0()
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${rtrn}"
+  assertEquals 0 "${RETURN}"
   assertEquals "" "$(cat ${STD_ERR})"
 
   assertFileContains "Grails ${grailsVersion} app detected" "${STD_OUT}"
@@ -103,7 +103,7 @@ testCompile_VersionUpgrade()
   local oldGrailsVersion="1.3.7"
   createGrailsApp ${oldGrailsVersion}
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${rtrn}"
+  assertEquals 0 "${RETURN}"
   assertEquals "" "$(cat ${STD_ERR})"
 
   assertFileContains "Grails ${oldGrailsVersion} app detected" "${STD_OUT}"
@@ -114,7 +114,7 @@ testCompile_VersionUpgrade()
   local newGrailsVersion="2.0.0"
   upgradeGrailsApp ${newGrailsVersion}
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${rtrn}"
+  assertEquals 0 "${RETURN}"
   assertEquals "" "$(cat ${STD_ERR})"
 
   assertFileContains "Grails ${newGrailsVersion} app detected" "${STD_OUT}"
@@ -125,7 +125,7 @@ testCompile_NoVersionChange()
 {
   createGrailsApp
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${rtrn}"
+  assertEquals 0 "${RETURN}"
   assertEquals "" "$(cat ${STD_ERR})"
   assertFileContains "Installing Grails" "${STD_OUT}"
 
@@ -133,7 +133,7 @@ testCompile_NoVersionChange()
 
   createGrailsApp
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${rtrn}"
+  assertEquals 0 "${RETURN}"
   assertEquals "" "$(cat ${STD_ERR})"
   assertFileNotContains "Installing Grails" "${STD_OUT}"
 }
@@ -148,7 +148,7 @@ testCompile_Version_Unknown()
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 1 "${rtrn}"
+  assertEquals 1 "${RETURN}"
   assertEquals "" "$(cat ${STD_ERR})"
 
   assertFileContains "Grails ${invalidGrailsVersion} app detected" "${STD_OUT}"
@@ -162,7 +162,7 @@ testJettyRunnerInstallation()
   assertFalse "Precondition: Jetty Runner should not be installed" "[ -d ${BUILD_DIR}/server ]"
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${rtrn}"
+  assertEquals 0 "${RETURN}"
   assertEquals "" "$(cat ${STD_ERR})"
 
   assertFileContains "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically." "${STD_OUT}"
@@ -180,7 +180,7 @@ testJettyRunnerInstallationSkippedIfServerProvided()
   assertTrue "Precondition: Custom server should be included in app" "[ -d ${BUILD_DIR}/server ]"
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${rtrn}"
+  assertEquals 0 "${RETURN}"
   assertEquals "" "$(cat ${STD_ERR})"
 
   assertFileNotContains "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically." "${STD_OUT}"
@@ -195,7 +195,7 @@ testCompliationFailsWhenApplicationPropertiesIsMissing()
   assertFalse "Precondition: application.properties should not exist" "[ -f ${BUILD_DIR}/application.properties ]"
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 1 "${rtrn}"
+  assertEquals 1 "${RETURN}"
   assertContains "File not found: application.properties. This file is required. Build failed." "$(cat ${STD_OUT})"
   assertEquals "" "$(cat ${STD_ERR})"
 }
@@ -206,7 +206,7 @@ testCheckBuildStatus()
   rm -r ${BUILD_DIR}/grails-app/* # delete contents of app to pass detection, but fail the build
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 1 "${rtrn}"
+  assertEquals 1 "${RETURN}"
   assertEquals "" "$(cat ${STD_ERR})"
 
   assertFileContains "Failed to build app" "${STD_OUT}"
