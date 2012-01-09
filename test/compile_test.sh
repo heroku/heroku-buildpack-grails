@@ -1,52 +1,70 @@
 #!/bin/sh
 
-# build failure due to pipestatus
-# downloading different valid versions
-# error downloading -- file does not exist
-# version detection regex
-# re-install with different verison
-# skip install if same version
-
 . ${BUILDPACK_TEST_RUNNER_HOME}/lib/test_utils.sh
 
-# Defaults
+GRAILS_TEST_CACHE="/tmp/grails_test_cache" 
 DEFAULT_GRAILS_VERSION="1.3.7"
-JETTY_RUNNER_VERSION="7.5.4.v20111024"
+DEFAULT_JETTY_RUNNER_VERSION="7.5.4.v20111024"
+
+installGrails()
+{
+  local grailsVersion=${1:-${DEFAULT_GRAILS_VERSION}}
+  local grailsUrl="http://s3.amazonaws.com/heroku-jvm-buildpack-grails/grails-${grailsVersion}.tar.gz"
+
+  if [ ! -d ${GRAILS_TEST_CACHE}/${grailsVersion}/.grails ]; then
+    mkdir -p ${GRAILS_TEST_CACHE}/${grailsVersion}
+    pwd="$(pwd)" 
+    cd ${GRAILS_TEST_CACHE}/${grailsVersion}
+    curl --silent --max-time 150 --location ${grailsUrl} | tar xz  
+    cd ${pwd}
+  fi
+  
+  [ -z "${JAVA_HOME}" ] && export JAVA_HOME=/usr/lib/jvm/java-6-openjdk    
+}
 
 createGrailsApp()
 {
-  GRAILS_VERSION=$1
-  GRAILS_URL="http://s3.amazonaws.com/heroku-jvm-buildpack-grails/grails-${GRAILS_VERSION}.tar.gz"
-  GRAILS_TAR_FILE="grails-heroku.tar.gz"
-  GRAILS_TEST_CACHE="/tmp/grails_test_cache" 
+  local grailsVersion=${1:-${DEFAULT_GRAILS_VERSION}}
 
-  pwd="$(pwd)" 
- 
-  if [ ! -d ${GRAILS_TEST_CACHE}/${GRAILS_VERSION} ]; then
-    echo "Preparing Grails ${GRAILS_VERSION} for testing..."
-
-    mkdir -p ${GRAILS_TEST_CACHE}/${GRAILS_VERSION}
-    cd ${GRAILS_TEST_CACHE}/${GRAILS_VERSION}
-    
-    # Download and install Grails
-    curl --silent --max-time 150 --location $GRAILS_URL | tar xz
-    
-    # Create a test app
-    [ -z "${JAVA_HOME}" ] && export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-    .grails/bin/grails create-app my-app >/dev/null
+  installGrails ${grailsVersion}
+  
+  if [ ! -d ${GRAILS_TEST_CACHE}/${grailsVersion}/test-app ]; then
+    pwd="$(pwd)"
+    cd ${GRAILS_TEST_CACHE}/${grailsVersion}
+    .grails/bin/grails create-app test-app >/dev/null
+    cd ${pwd}
   fi
+
+  cp -r ${GRAILS_TEST_CACHE}/${grailsVersion}/test-app/* ${BUILD_DIR}
+}
+
+upgradeGrailsApp()
+{
+  local grailsVersion=${1?"Grails version must be specified"}
+
+  installGrails ${grailsVersion}
   
-  # Copy the cached app for the specified version to this test's build dir
-  cp -r ${GRAILS_TEST_CACHE}/${GRAILS_VERSION}/my-app/* ${BUILD_DIR}
-  
+  pwd="$(pwd)" 
+  cd ${BUILD_DIR}
+  ${GRAILS_TEST_CACHE}/${grailsVersion}/.grails/bin/grails upgrade --non-interactive >/dev/null
   cd ${pwd}
 }
 
+changeGrailsVersion()
+{
+  local grailsVersion=${1?"Grails version must be specified"}
+
+  sed -E "s/(app.grails.version=).*$/\1${grailsVersion}/" ${BUILD_DIR}/application.properties > ${BUILD_DIR}/application.properties.tmp
+  mv ${BUILD_DIR}/application.properties.tmp ${BUILD_DIR}/application.properties
+}
+
+###
+
 testCompile_Version_1_3_7()
 {
-  GRAILS_VERSION="1.3.7"
+  local grailsVersion="1.3.7"
 
-  createGrailsApp ${GRAILS_VERSION}
+  createGrailsApp ${grailsVersion}
   assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
@@ -54,8 +72,8 @@ testCompile_Version_1_3_7()
   assertEquals 0 "${rtrn}"
   assertEquals "" "$(cat ${STD_ERR})"
 
-  assertFileContains "Grails ${GRAILS_VERSION} app detected" "${STD_OUT}"
-  assertFileContains "Installing Grails ${GRAILS_VERSION}" "${STD_OUT}"
+  assertFileContains "Grails ${grailsVersion} app detected" "${STD_OUT}"
+  assertFileContains "Installing Grails ${grailsVersion}" "${STD_OUT}"
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
   assertFileContains "Grails 1.3.7 should pre-compile" "grails -Divy.default.ivy.user.dir=${CACHE_DIR} compile" "${STD_OUT}"
   assertFileContains "Grails 1.3.7 should not specify -plain-output flag" "grails  -Divy.default.ivy.user.dir=${CACHE_DIR} war" "${STD_OUT}"
@@ -63,9 +81,9 @@ testCompile_Version_1_3_7()
 
 testCompile_Version_2_0_0()
 {
-  GRAILS_VERSION="2.0.0"
+  local grailsVersion="2.0.0"
 
-  createGrailsApp ${GRAILS_VERSION}
+  createGrailsApp ${grailsVersion}
   assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
@@ -73,19 +91,58 @@ testCompile_Version_2_0_0()
   assertEquals 0 "${rtrn}"
   assertEquals "" "$(cat ${STD_ERR})"
 
-  assertFileContains "Grails ${GRAILS_VERSION} app detected" "${STD_OUT}"
-  assertFileContains "Installing Grails ${GRAILS_VERSION}" "${STD_OUT}"
+  assertFileContains "Grails ${grailsVersion} app detected" "${STD_OUT}"
+  assertFileContains "Installing Grails ${grailsVersion}" "${STD_OUT}"
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
-  assertFileNotContains "Grails 2.0.0 should not pre-compile" "grails -Divy.default.ivy.user.dir=${CACHE_DIR} compile" "${STD_OUT}"
-  assertFileContains "Non-Grails 1.3.7 should specify -plain-output flag" "grails -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war" "${STD_OUT}"
+  assertFileNotContains "Grails 2.0.0 apps should not pre-compile" "grails -Divy.default.ivy.user.dir=${CACHE_DIR} compile" "${STD_OUT}"
+  assertFileContains "Grails non-1.3.7 apps should specify -plain-output flag" "grails -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war" "${STD_OUT}"
+}
+
+testCompile_VersionUpgrade()
+{
+  local oldGrailsVersion="1.3.7"
+  createGrailsApp ${oldGrailsVersion}
+  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
+  assertEquals 0 "${rtrn}"
+  assertEquals "" "$(cat ${STD_ERR})"
+
+  assertFileContains "Grails ${oldGrailsVersion} app detected" "${STD_OUT}"
+  assertFileContains "Installing Grails ${oldGrailsVersion}" "${STD_OUT}"
+
+  resetCapture
+
+  local newGrailsVersion="2.0.0"
+  upgradeGrailsApp ${newGrailsVersion}
+  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
+  assertEquals 0 "${rtrn}"
+  assertEquals "" "$(cat ${STD_ERR})"
+
+  assertFileContains "Grails ${newGrailsVersion} app detected" "${STD_OUT}"
+  assertFileContains "Updating Grails version. Previous version was ${oldGrailsVersion}. Updating to ${newGrailsVersion}..." "${STD_OUT}"
+}
+
+testCompile_NoVersionChange()
+{
+  createGrailsApp
+  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
+  assertEquals 0 "${rtrn}"
+  assertEquals "" "$(cat ${STD_ERR})"
+  assertFileContains "Installing Grails" "${STD_OUT}"
+
+  resetCapture
+
+  createGrailsApp
+  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
+  assertEquals 0 "${rtrn}"
+  assertEquals "" "$(cat ${STD_ERR})"
+  assertFileNotContains "Installing Grails" "${STD_OUT}"
 }
 
 testCompile_Version_Unknown()
 {
-  createGrailsApp ${DEFAULT_GRAILS_VERSION}
-  INVALID_GRAILS_VERSION="0.0.0"
-  sed -E "s/(app.grails.version=).*$/\1${INVALID_GRAILS_VERSION}/" ${BUILD_DIR}/application.properties > ${BUILD_DIR}/application.properties.tmp
-  mv ${BUILD_DIR}/application.properties.tmp ${BUILD_DIR}/application.properties
+  createGrailsApp
+  local invalidGrailsVersion="0.0.0"
+  changeGrailsVersion ${invalidGrailsVersion}
 
   assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
@@ -94,30 +151,30 @@ testCompile_Version_Unknown()
   assertEquals 1 "${rtrn}"
   assertEquals "" "$(cat ${STD_ERR})"
 
-  assertFileContains "Grails ${INVALID_GRAILS_VERSION} app detected" "${STD_OUT}"
+  assertFileContains "Grails ${invalidGrailsVersion} app detected" "${STD_OUT}"
   assertFileContains "Error installing Grails framework or unsupported Grails framework version specified." "${STD_OUT}"
   assertFalse "Grails should not have been installed" "[ -d ${CACHE_DIR}/.grails ]"
 }
 
 testJettyRunnerInstallation()
 {
-  createGrailsApp ${DEFAULT_GRAILS_VERSION}
+  createGrailsApp
   assertFalse "Precondition: Jetty Runner should not be installed" "[ -d ${BUILD_DIR}/server ]"
 
   capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
   assertEquals 0 "${rtrn}"
   assertEquals "" "$(cat ${STD_ERR})"
 
-  assertFileContains "No server directory found. Adding jetty-runner ${JETTY_RUNNER_VERSION} automatically." "${STD_OUT}"
+  assertFileContains "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically." "${STD_OUT}"
   assertTrue "server dir should exist" "[ -d ${BUILD_DIR}/server ]"
   assertTrue "Jetty Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/jetty-runner.jar ]"
-  assertEquals "vendored:${JETTY_RUNNER_VERSION}" "$(cat ${BUILD_DIR}/server/jettyVersion)"
-  assertEquals "vendored:${JETTY_RUNNER_VERSION}" "$(cat ${CACHE_DIR}/jettyVersion)"
+  assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${BUILD_DIR}/server/jettyVersion)"
+  assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${CACHE_DIR}/jettyVersion)"
 }
 
 testJettyRunnerInstallationSkippedIfServerProvided()
 {
-  createGrailsApp ${DEFAULT_GRAILS_VERSION}
+  createGrailsApp
   mkdir -p ${BUILD_DIR}/server
 
   assertTrue "Precondition: Custom server should be included in app" "[ -d ${BUILD_DIR}/server ]"
@@ -126,7 +183,7 @@ testJettyRunnerInstallationSkippedIfServerProvided()
   assertEquals 0 "${rtrn}"
   assertEquals "" "$(cat ${STD_ERR})"
 
-  assertFileNotContains "No server directory found. Adding jetty-runner ${JETTY_RUNNER_VERSION} automatically." "${STD_OUT}"
+  assertFileNotContains "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically." "${STD_OUT}"
   assertFalse "[ -f ${BUILD_DIR}/server/jettyVersion ]"
   assertFalse "[ -f ${CACHE_DIR}/jettyVersion ]"
 }
@@ -143,3 +200,14 @@ testCompliationFailsWhenApplicationPropertiesIsMissing()
   assertEquals "" "$(cat ${STD_ERR})"
 }
 
+testCheckBuildStatus()
+{
+  createGrailsApp
+  rm -r ${BUILD_DIR}/grails-app/* # delete contents of app to pass detection, but fail the build
+
+  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
+  assertEquals 1 "${rtrn}"
+  assertEquals "" "$(cat ${STD_ERR})"
+
+  assertFileContains "Failed to build app" "${STD_OUT}"
+}
