@@ -22,6 +22,11 @@ installGrails()
   [ -z "${JAVA_HOME}" ] && export JAVA_HOME=/usr/lib/jvm/java-6-openjdk    
 }
 
+getInstalledGrailsVersion()
+{
+  grep '^grails\.version' ${CACHE_DIR}/.grails/build.properties | sed -E -e 's/grails\.version[ \t]*=[ \t]*([^ \t]+)[ \t]*$/\1/g'
+}
+
 createGrailsApp()
 {
   local grailsVersion=${1:-${DEFAULT_GRAILS_VERSION}}
@@ -75,6 +80,7 @@ testCompile_Version_1_3_7()
   assertFileContains "Grails ${grailsVersion} app detected" "${STD_OUT}"
   assertFileContains "Installing Grails ${grailsVersion}" "${STD_OUT}"
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
+  assertEquals "Correct Grails version should have been installed" "${grailsVersion}" "$(getInstalledGrailsVersion)"
   assertFileContains "Grails 1.3.7 should pre-compile" "grails -Divy.default.ivy.user.dir=${CACHE_DIR} compile" "${STD_OUT}"
   assertFileContains "Grails 1.3.7 should not specify -plain-output flag" "grails  -Divy.default.ivy.user.dir=${CACHE_DIR} war" "${STD_OUT}"
 }
@@ -94,6 +100,7 @@ testCompile_Version_2_0_0()
   assertFileContains "Grails ${grailsVersion} app detected" "${STD_OUT}"
   assertFileContains "Installing Grails ${grailsVersion}" "${STD_OUT}"
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
+  assertEquals "Correct Grails version should have been installed" "${grailsVersion}" "$(getInstalledGrailsVersion)"
   assertFileNotContains "Grails 2.0.0 apps should not pre-compile" "grails -Divy.default.ivy.user.dir=${CACHE_DIR} compile" "${STD_OUT}"
   assertFileContains "Grails non-1.3.7 apps should specify -plain-output flag" "grails -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war" "${STD_OUT}"
 }
