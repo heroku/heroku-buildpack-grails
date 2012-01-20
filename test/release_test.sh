@@ -16,8 +16,8 @@ default_process_types:
 
 EOF`
 
-  capture ${BUILDPACK_HOME}/bin/release ${BUILD_DIR}
-  assertEquals 0 ${RETURN}
+  release
+
+  assertCapturedSuccess
   assertEquals "${expected_release_output}" "$(cat ${STD_OUT})"
-  assertEquals "" "$(cat ${STD_ERR})"
 }

@@ -68,15 +68,13 @@ changeGrailsVersion()
 testCompile_Version_1_3_7()
 {
   local grailsVersion="1.3.7"
-
   createGrailsApp ${grailsVersion}
   assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-
+  compile
+  
+  assertCapturedSuccess
   assertFileContains "Grails ${grailsVersion} app detected" "${STD_OUT}"
   assertFileContains "Installing Grails ${grailsVersion}" "${STD_OUT}"
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
@@ -88,15 +86,13 @@ testCompile_Version_1_3_7()
 testCompile_Version_2_0_0()
 {
   local grailsVersion="2.0.0"
-
   createGrailsApp ${grailsVersion}
   assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-
+  compile
+  
+  assertCapturedSuccess
   assertFileContains "Grails ${grailsVersion} app detected" "${STD_OUT}"
   assertFileContains "Installing Grails ${grailsVersion}" "${STD_OUT}"
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
@@ -109,39 +105,35 @@ testCompile_VersionUpgrade()
 {
   local oldGrailsVersion="1.3.7"
   createGrailsApp ${oldGrailsVersion}
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
+  
+  compile
 
+  assertCapturedSuccess
   assertFileContains "Grails ${oldGrailsVersion} app detected" "${STD_OUT}"
   assertFileContains "Installing Grails ${oldGrailsVersion}" "${STD_OUT}"
 
-  resetCapture
-
   local newGrailsVersion="2.0.0"
   upgradeGrailsApp ${newGrailsVersion}
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
 
+  compile
+  
+  assertCapturedSuccess
   assertFileContains "Grails ${newGrailsVersion} app detected" "${STD_OUT}"
   assertFileContains "Updating Grails version. Previous version was ${oldGrailsVersion}. Updating to ${newGrailsVersion}..." "${STD_OUT}"
 }
 
-testCompile_NoVersionChange()
+testCompile_NoVersionChangeDoesNotReinstallGrails()
 {
   createGrailsApp
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
+
+  compile
+  
+  assertCapturedSuccess
   assertFileContains "Installing Grails" "${STD_OUT}"
 
-  resetCapture
+  compile
 
-  createGrailsApp
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
+  assertCapturedSuccess
   assertFileNotContains "Installing Grails" "${STD_OUT}"
 }
 
@@ -150,16 +142,13 @@ testCompile_Version_Unknown()
   createGrailsApp
   local invalidGrailsVersion="0.0.0"
   changeGrailsVersion ${invalidGrailsVersion}
-
   assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 1 "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
+  compile
 
+  assertCapturedError "Error installing Grails framework or unsupported Grails framework version specified."
   assertFileContains "Grails ${invalidGrailsVersion} app detected" "${STD_OUT}"
-  assertFileContains "Error installing Grails framework or unsupported Grails framework version specified." "${STD_OUT}"
   assertFalse "Grails should not have been installed" "[ -d ${CACHE_DIR}/.grails ]"
 }
 
@@ -168,10 +157,9 @@ testJettyRunnerInstallation()
   createGrailsApp
   assertFalse "Precondition: Jetty Runner should not be installed" "[ -d ${BUILD_DIR}/server ]"
 
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-
+  compile
+  
+  assertCapturedSuccess
   assertFileContains "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically." "${STD_OUT}"
   assertTrue "server dir should exist" "[ -d ${BUILD_DIR}/server ]"
   assertTrue "Jetty Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/jetty-runner.jar ]"
@@ -183,13 +171,11 @@ testJettyRunnerInstallationSkippedIfServerProvided()
 {
   createGrailsApp
   mkdir -p ${BUILD_DIR}/server
-
   assertTrue "Precondition: Custom server should be included in app" "[ -d ${BUILD_DIR}/server ]"
 
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 0 "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
+  compile
 
+  assertCapturedSuccess
   assertFileNotContains "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically." "${STD_OUT}"
   assertFalse "[ -f ${BUILD_DIR}/server/jettyVersion ]"
   assertFalse "[ -f ${CACHE_DIR}/jettyVersion ]"
@@ -198,13 +184,11 @@ testJettyRunnerInstallationSkippedIfServerProvided()
 testCompliationFailsWhenApplicationPropertiesIsMissing()
 {
   mkdir -p ${BUILD_DIR}/grails-app
-
   assertFalse "Precondition: application.properties should not exist" "[ -f ${BUILD_DIR}/application.properties ]"
 
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 1 "${RETURN}"
-  assertContains "File not found: application.properties. This file is required. Build failed." "$(cat ${STD_OUT})"
-  assertEquals "" "$(cat ${STD_ERR})"
+  compile
+
+  assertCapturedError "File not found: application.properties. This file is required. Build failed."
 }
 
 testCheckBuildStatus()
@@ -212,9 +196,7 @@ testCheckBuildStatus()
   createGrailsApp
   rm -r ${BUILD_DIR}/grails-app/* # delete contents of app to pass detection, but fail the build
 
-  capture ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-  assertEquals 1 "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
+  compile
 
-  assertFileContains "Failed to build app" "${STD_OUT}"
+  assertCapturedError "Failed to build app"
 }
