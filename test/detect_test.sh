@@ -6,20 +6,16 @@ testDetect()
 {
   mkdir -p ${BUILD_DIR}/grails-app
   
-  capture ${BUILDPACK_HOME}/bin/detect ${BUILD_DIR}
-  
-  assertEquals 0 ${RETURN}
-  assertEquals "Grails" "$(cat ${STD_OUT})"
-  assertNull "$(cat ${STD_ERR})"
+  detect
+
+  assertAppDetected "Grails"
 }
 
 testNoDetectGrailsAppFileInsteadOfDirectory()
 {
   touch ${BUILD_DIR}/grails-app
 
-  capture ${BUILDPACK_HOME}/bin/detect ${BUILD_DIR}
- 
-  assertEquals 1 ${RETURN}
-  assertEquals "no" "$(cat ${STD_OUT})"
-  assertNull "$(cat ${STD_ERR})"
+  detect
+
+  assertNoAppDetected 
 }
