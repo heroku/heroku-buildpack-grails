@@ -60,3 +60,26 @@ EOF
   assertCapturedExactly "1.2.3"
 }
 
+testGetPropertyWithSpaces()
+{
+  cat > ${OUTPUT_DIR}/sample.properties <<EOF
+application.version   =    1.2.3    
+EOF
+
+  capture get_property ${OUTPUT_DIR}/sample.properties application.version
+
+  assertCapturedSuccess
+  assertCapturedExactly "1.2.3"
+}
+
+testGetPropertyWithTabs()
+{
+  sed -e 's/ /\t/g' > ${OUTPUT_DIR}/sample.properties <<EOF
+application.version   =    1.2.3    
+EOF
+
+  capture get_property ${OUTPUT_DIR}/sample.properties application.version
+
+  assertCapturedSuccess
+  assertCapturedExactly "1.2.3"
+}
