@@ -9,6 +9,9 @@ BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
 BUILD_DIR=$1
 CACHE_DIR=$2
 
+# source in common functions
+. $BIN_DIR/common.sh
+
 GRAILS_DIR=".grails"
 
 check_build_status()
@@ -17,14 +20,6 @@ check_build_status()
     echo " !     Failed to build app"
     exit 1
   fi
-}
-
-get_property()
-{
-  local file=$1
-  local key=$(echo $2 | sed "s/\./\\\./g")
-
-  grep ^$key $file | sed -E -e "s/$key[ \t]*=[ \t]*([^ \t]+)[ \t]*$/\1/g"
 }
 
 install_grails()
