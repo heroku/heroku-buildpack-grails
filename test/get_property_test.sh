@@ -15,7 +15,7 @@ EOF
   capture get_property ${OUTPUT_DIR}/sample.properties application.version
 
   assertCapturedSuccess
-  assertCapturedExactly "${EXPECTED_VERSION}"
+  assertCapturedEquals "${EXPECTED_VERSION}"
 }
 
 testGetPropertyOnMutipleLines_Unix()
@@ -30,7 +30,7 @@ EOF
   capture get_property ${OUTPUT_DIR}/sample.properties application.version
   
   assertCapturedSuccess
-  assertCapturedExactly "${EXPECTED_VERSION}"
+  assertCapturedEquals "${EXPECTED_VERSION}"
 }
 
 
@@ -44,7 +44,7 @@ EOF
   capture get_property ${OUTPUT_DIR}/sample.properties application.version
   
   assertCapturedSuccess
-  assertCapturedExactly "${EXPECTED_VERSION}"
+  assertCapturedEquals "${EXPECTED_VERSION}"
 }
 
 testGetPropertyOnMutipleLines_Windows()
@@ -59,7 +59,7 @@ EOF
   capture get_property ${OUTPUT_DIR}/sample.properties application.version
 
   assertCapturedSuccess
-  assertCapturedExactly "${EXPECTED_VERSION}"
+  assertCapturedEquals "${EXPECTED_VERSION}"
 }
 
 testGetPropertyWithSpaces()
@@ -71,7 +71,7 @@ EOF
   capture get_property ${OUTPUT_DIR}/sample.properties application.version
 
   assertCapturedSuccess
-  assertCapturedExactly "${EXPECTED_VERSION}"
+  assertCapturedEquals "${EXPECTED_VERSION}"
 }
 
 testGetPropertyWithTabs()
@@ -83,7 +83,7 @@ EOF
   capture get_property ${OUTPUT_DIR}/sample.properties application.version
 
   assertCapturedSuccess
-  assertCapturedExactly "${EXPECTED_VERSION}"
+  assertCapturedEquals "${EXPECTED_VERSION}"
 }
 
 testGetPropertyWithDashAndLetters()
@@ -96,5 +96,5 @@ EOF
   capture get_property ${OUTPUT_DIR}/sample.properties application.version
 
   assertCapturedSuccess
-  assertCapturedExactly "-${EXPECTED_VERSION}-zAc-"
+  assertCapturedEquals "-${EXPECTED_VERSION}-zAc-"
 }
