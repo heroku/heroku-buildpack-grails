@@ -9,6 +9,9 @@ BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
 BUILD_DIR=$1
 CACHE_DIR=$2
 
+# source in common functions
+. $BIN_DIR/common.sh
+
 GRAILS_DIR=".grails"
 
 check_build_status()
@@ -50,7 +53,7 @@ if [ ! -f $BUILD_DIR/application.properties ] ; then
     exit 1
 fi
     
-GRAILS_VERSION=`grep app\.grails\.version $BUILD_DIR/application.properties | sed -E -e 's/app\.grails\.version[ \t]*=[ \t]*([^ \t]+)[ \t]*$/\1/g'`
+GRAILS_VERSION=$(get_property $BUILD_DIR/application.properties 'app.grails.version')
 
 echo "-----> Grails $GRAILS_VERSION app detected"
 
@@ -64,7 +67,7 @@ cd $CACHE_DIR
 if [ ! -d $GRAILS_DIR ]; then
   install_grails $GRAILS_VERSION
 else
-  INSTALLED_GRAILS_VERSION=`grep '^grails\.version' $GRAILS_DIR/build.properties | sed -E -e 's/grails\.version[ \t]*=[ \t]*([^ \t]+)[ \t]*$/\1/g'`
+  INSTALLED_GRAILS_VERSION=$(get_property $GRAILS_DIR/build.properties 'grails.version')
   if [ "$INSTALLED_GRAILS_VERSION" != "$GRAILS_VERSION" ] ; then
     echo "-----> Updating Grails version. Previous version was $INSTALLED_GRAILS_VERSION. Updating to $GRAILS_VERSION..."
     rm -rf $GRAILS_DIR
