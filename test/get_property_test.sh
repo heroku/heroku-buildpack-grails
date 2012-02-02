@@ -5,6 +5,18 @@
 
 EXPECTED_VERSION=0.1.5.9
 
+testGetPropertyMissing()
+{  
+  cat > ${OUTPUT_DIR}/sample.properties <<EOF
+another.key=another.value
+EOF
+
+  capture get_property ${OUTPUT_DIR}/sample.properties application.version
+
+  assertCapturedSuccess
+  assertCapturedEquals ""
+}
+
 testGetPropertyOnSingleLine_Unix()
 {  
   cat > ${OUTPUT_DIR}/sample.properties <<EOF
