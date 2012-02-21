@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#grails-version-deploy.sh <grails version number>
+#grails-version-package.sh <grails version number>
 #Do not run on OSX. Grails cannot deal with the resource forks (._ file copies) that HFS creates.
 GRAILS_VERSION=$1
 
