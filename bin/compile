@@ -52,7 +52,7 @@ if [ ! -f $BUILD_DIR/application.properties ] ; then
     echo " !     Failed to build app"
     exit 1
 fi
-    
+
 GRAILS_VERSION=$(get_property $BUILD_DIR/application.properties 'app.grails.version')
 
 echo "-----> Grails $GRAILS_VERSION app detected"
@@ -89,14 +89,18 @@ cd $BUILD_DIR
 # build app
 if [ "$GRAILS_VERSION" != "1.3.7" ] ; then
     BUILDCMD_OPT="-plain-output"
-else
-    COMPILECMD="grails -Divy.default.ivy.user.dir=$CACHE_DIR compile"
-    echo "-----> Executing $COMPILECMD"
-    eval "$COMPILECMD" | sed -u 's/^/       /'
-    check_build_status
+fi
+COMPILECMD="grails -Divy.default.ivy.user.dir=$CACHE_DIR compile"
+echo "-----> Executing $COMPILECMD"
+eval "$COMPILECMD" | sed -u 's/^/       /'
+check_build_status
+
+GRAILS_ENV=$(get_property $BUILD_DIR/heroku-build.properties 'grails.env')
+if [ -z "$GRAILS_ENV" ] ; then
+    GRAILS_ENV='production'
 fi
 
-BUILDCMD="grails $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war"
+BUILDCMD="grails -Dgrails.env=$GRAILS_ENV $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war"
 echo "-----> Executing $BUILDCMD"
 eval "$BUILDCMD" | sed -u 's/^/       /'
 check_build_status
@@ -110,5 +114,3 @@ if [ ! -d server ] ; then
     echo "vendored:$JETTY_RUNNER_VERSION" > server/jettyVersion
     echo "vendored:$JETTY_RUNNER_VERSION" > $CACHE_DIR/jettyVersion
 fi
-
-
