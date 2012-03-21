@@ -60,4 +60,6 @@ This is the default buildpack repository for Grails. You can fork this repo and 
 
     $ heroku create --stack cedar --buildpack http://github.com/jesperfj/heroku-buildpack-grails.git
 
+## License
 
+Licensed under the MIT License. See LICENSE file.
