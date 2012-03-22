@@ -95,6 +95,7 @@ fi
 # if a populated cache was checked in copy it into the cache
 # remove the checked in cache dir aftewards to save slug size
 if [ -d ivy-cache ]; then
+  echo "-----> Found ivy-cache directory in the repo. Using it to prime the cache"
   cp -r ivy-cache $CACHE_DIR/.grails_cache/
   rm -r ivy-cache
 fi
