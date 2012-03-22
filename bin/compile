@@ -86,7 +86,7 @@ export PATH=$GRAILS_HOME/bin:$PATH
 
 cd $BUILD_DIR
 
-# if cache directory doesn't exist create it
+# if grails cache directory doesn't exist create it
 if [ ! -d $CACHE_DIR/.grails_cache ]; then
   mkdir $CACHE_DIR/.grails_cache
 fi
@@ -98,6 +98,15 @@ fi
 
 # copy the grails cache dir to the home directory where grails will use it
 cp -r $CACHE_DIR/.grails_cache $HOME/.grails
+
+echo "build cache dir"
+ls -al $CACHE_DIR
+echo "grails cache dir"
+ls -al $CACHE_DIR/.grails_cache
+echo "home"
+ls -al $HOME
+echo ".grails in home"
+ls -al $HOME/.grails
 
 # build app
 if [ "$GRAILS_VERSION" != "1.3.7" ] ; then
@@ -113,6 +122,11 @@ BUILDCMD="grails $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war"
 echo "-----> Executing $BUILDCMD"
 eval "$BUILDCMD" | sed -u 's/^/       /'
 check_build_status
+
+echo "post build home"
+ls -al $HOME
+echo "post build .grails in home"
+ls -al $HOME/.grails
 
 # copy the grails cache dir back into the build cache dir for use in next build
 cp -r $HOME/.grails $CACHE_DIR/.grails_cache
