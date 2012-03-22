@@ -98,7 +98,7 @@ fi
 
 # copy the grails cache dir to the home directory where grails will use it
 mkdir $HOME/.grails
-if [ -f $CACHE_DIR/.grails_cache/* -o -d $CACHE_DIR/.grails_cache/* ]; then
+if [ "$(ls -A $CACHE_DIR/.grails_cache)" ]; then
   echo "copying grails cache from build cache to home"
   cp -r $CACHE_DIR/.grails_cache/* $HOME/.grails
 fi
