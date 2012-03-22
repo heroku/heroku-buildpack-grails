@@ -92,9 +92,9 @@ if [ ! -d $CACHE_DIR/.grails_cache ]; then
 fi
 
 # if a populated cache was checked in copy it into the cache
-if [ -d ivy_cache ]; then
-  cp -r ivy_cache $CACHE_DIR/.grails_cache/
-  rm -r ivy_cache
+if [ -d ivy-cache ]; then
+  cp -r ivy-cache $CACHE_DIR/.grails_cache/
+  rm -r ivy-cache
 fi
 
 # copy the grails cache dir to the home directory where grails will use it
