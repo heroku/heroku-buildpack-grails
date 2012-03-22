@@ -57,6 +57,8 @@ GRAILS_VERSION=$(get_property $BUILD_DIR/application.properties 'app.grails.vers
 
 echo "-----> Grails $GRAILS_VERSION app detected"
 
+echo "home directory: $HOME"
+
 if [ ! -d $CACHE_DIR ] ; then
   mkdir $CACHE_DIR
 fi
