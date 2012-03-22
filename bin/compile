@@ -98,7 +98,7 @@ fi
 
 # copy the grails cache dir to the home directory where grails will use it
 mkdir $HOME/.grails
-cp -r $CACHE_DIR/.grails_cache/ $HOME/.grails
+cp -r $CACHE_DIR/.grails_cache/* $HOME/.grails
 
 echo "build cache dir"
 ls -al $CACHE_DIR
@@ -130,7 +130,7 @@ echo "post build .grails in home"
 ls -al $HOME/.grails
 
 # copy the grails cache dir back into the build cache dir for use in next build
-cp -r $HOME/.grails/ $CACHE_DIR/.grails_cache
+cp -r $HOME/.grails/* $CACHE_DIR/.grails_cache
 
 echo ".grails_cache in build cache dir"
 ls -al $CACHE_DIR/.grails_cache
