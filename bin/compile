@@ -111,12 +111,12 @@ echo "grails.dependency.cache.dir = '$CACHE_DIR/.grails_cache'" >> $HOME/.grails
 # build app
 if [ "$GRAILS_VERSION" != "1.3.7" ] ; then
     BUILDCMD_OPT="-plain-output"
-else
-    COMPILECMD="grails -Divy.default.ivy.user.dir=$CACHE_DIR compile"
-    echo "-----> Executing $COMPILECMD"
-    eval "$COMPILECMD" | sed -u 's/^/       /'
-    check_build_status
 fi
+
+COMPILECMD="grails -Divy.default.ivy.user.dir=$CACHE_DIR compile"
+echo "-----> Executing $COMPILECMD"
+eval "$COMPILECMD" | sed -u 's/^/       /'
+check_build_status
 
 BUILDCMD="grails $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war"
 echo "-----> Executing $BUILDCMD"
