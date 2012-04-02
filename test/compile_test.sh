@@ -97,8 +97,8 @@ testCompile_Version_2_0_0()
   assertCaptured "Installing Grails ${grailsVersion}" 
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
   assertEquals "Correct Grails version should have been installed" "${grailsVersion}" "$(getInstalledGrailsVersion)"
-  assertNotCaptured "Grails 2.0.0 apps should not pre-compile" "grails -Divy.default.ivy.user.dir=${CACHE_DIR} compile" 
   assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "grails -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war" 
+  assertTrue "Cache directory should have been created" "[ -d ${CACHE_DIR}/.grails_cache ]"
 }
 
 testCompile_VersionUpgrade()
