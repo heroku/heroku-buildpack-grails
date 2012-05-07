@@ -110,3 +110,13 @@ EOF
   assertCapturedSuccess
   assertCapturedEquals "-${EXPECTED_VERSION}-zAc-"
 }
+
+testGetPropertyWithOptionalEqualsSign() {
+  cat > ${OUTPUT_DIR}/sample.properties <<EOF
+application.version $EXPECTED_VERSION
+EOF
+  capture get_property ${OUTPUT_DIR}/sample.properties application.version
+  assertCapturedSuccess
+  assertCapturedEquals "${EXPECTED_VERSION}"
+}
+
