@@ -65,6 +65,25 @@ changeGrailsVersion()
 
 ###
 
+testNonInteractiveMode() {
+  createGrailsApp "2.0.0"
+  cat > ${BUILD_DIR}/scripts/_Events.groovy <<EOF
+import org.codehaus.groovy.grails.cli.CommandLineHelper
+includeTargets << grailsScript("_GrailsEvents")
+includeTargets << grailsScript("_GrailsInit")
+eventCompileStart = {
+  if (isInteractive) {
+    new CommandLineHelper().userInput("Gimme input")
+  } else {
+    println "No input allowed in non-interactive mode."
+  }
+}
+EOF
+  compile
+  assertCapturedSuccess
+  assertCaptured "Build should have succeeded with an upgraded dependency." "No input allowed in non-interactive mode."
+}
+
 testCompile_Version_1_3_7()
 {
   local grailsVersion="1.3.7"
