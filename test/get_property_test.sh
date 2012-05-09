@@ -110,3 +110,50 @@ EOF
   assertCapturedSuccess
   assertCapturedEquals "-${EXPECTED_VERSION}-zAc-"
 }
+
+testGetPropertyWithOptionalEqualsSign() {
+  cat > ${OUTPUT_DIR}/sample.properties <<EOF
+application.version $EXPECTED_VERSION
+EOF
+  capture get_property ${OUTPUT_DIR}/sample.properties application.version
+  assertCapturedSuccess
+  assertCapturedEquals "${EXPECTED_VERSION}"
+}
+
+testGetPropertyWithNoEqualsSignNoSpaces() {
+  cat > ${OUTPUT_DIR}/sample.properties <<EOF
+application.version1234
+EOF
+  capture get_property ${OUTPUT_DIR}/sample.properties application.version
+  assertCapturedSuccess
+  assertCapturedEquals ""
+}
+
+testGetPropertyWithNoValue() {
+  cat > ${OUTPUT_DIR}/sample.properties <<EOF
+application.version
+EOF
+  capture get_property ${OUTPUT_DIR}/sample.properties application.version
+  assertCapturedSuccess
+  assertCapturedEquals ""
+}
+
+testGetPropertyWithSimilarNames() {
+  cat > ${OUTPUT_DIR}/sample.properties <<EOF
+application.version=${EXPECTED_VERSION}
+application.version.new=${EXPECTED_VERSION}-new
+EOF
+  capture get_property ${OUTPUT_DIR}/sample.properties application.version.new
+  assertCapturedSuccess
+  assertCapturedEquals "${EXPECTED_VERSION}-new"
+}
+
+testGetPropertyWithSimilarNameReverseOrder() {
+  cat > ${OUTPUT_DIR}/sample.properties <<EOF
+application.version.new=${EXPECTED_VERSION}-new
+application.version=${EXPECTED_VERSION}
+EOF
+  capture get_property ${OUTPUT_DIR}/sample.properties application.version.new
+  assertCapturedSuccess
+  assertCapturedEquals "${EXPECTED_VERSION}-new"
+}
