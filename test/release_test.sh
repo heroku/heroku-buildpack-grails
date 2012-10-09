@@ -19,5 +19,5 @@ EOF`
   release
 
   assertCapturedSuccess
-  assertCaptured "${expected_release_output}"
+  assertCapturedEquals "${expected_release_output}"
 }
