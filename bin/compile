@@ -12,6 +12,9 @@ CACHE_DIR=$2
 # source in common functions
 . $BIN_DIR/common.sh
 
+curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
+. bin/java
+
 GRAILS_DIR=".grails"
 
 check_build_status()
@@ -60,6 +63,18 @@ echo "       WARNING: The Grails buildpack is currently in Beta."
 
 if [ ! -d $CACHE_DIR ] ; then
   mkdir $CACHE_DIR
+fi
+
+# install JDK
+if [ -f ${BUILD_DIR}/system.properties ]; then
+  logger -p user.notice -t "slugc[$$]" "language_pack_java download_jdk"
+  LOGGER_FLAGS="$LOGGER_FLAGS download_jdk"
+  javaVersion=$(detect_java_version ${BUILD_DIR})
+  echo -n "-----> Installing OpenJDK ${javaVersion}..."
+  install_java ${BUILD_DIR} ${javaVersion}
+  jdk_overlay ${BUILD_DIR}
+  echo "done"
+  cp ${BUILD_DIR}/system.properties ${CACHE_DIR}/
 fi
 
 cd $CACHE_DIR
