@@ -7,6 +7,7 @@ testRelease()
   expected_release_output=`cat <<EOF
 ---
 config_vars:
+  PATH: .jdk/bin:.sbt_home/bin:/usr/local/bin:/usr/bin:/bin
   JAVA_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
 addons:
   heroku-postgresql:dev
