@@ -4,7 +4,7 @@ This is a Heroku buildpack for building and deploying Grails apps on Heroku.
 
 ## Usage
 
-1. Create a Git repository for a Grails 1.3.7 or 2.0 app:
+#### Create a Git repository for a Grails 1.3.7 or 2.0 app:
 
     $ cd mygrailsapp
     $ ls
@@ -23,7 +23,7 @@ This is a Heroku buildpack for building and deploying Grails apps on Heroku.
      create mode 100644 application.properties
     ...
     
-2. Create a Heroku app on the Cedar stack specifying my custom buildpack.
+#### Create a Heroku app on the Cedar stack specifying my custom buildpack.
 
     $ heroku create --stack cedar --buildpack https://github.com/csherstan/heroku-buildpack-grails.git
     Creating vivid-mist-9984... done, stack is cedar
@@ -33,7 +33,7 @@ This is a Heroku buildpack for building and deploying Grails apps on Heroku.
 If you already have an existing app on Heroku then specify the custom buildpack like so:
 	$ heroku config:add BUILDPACK_URL=https://github.com/csherstan/heroku-buildpack-grails.git
     
-3. Specifying a specific build environment
+#### Specifying a specific build environment
 
 By default the build pack runs grails war, which assumes the production environment. To specify a different environment to use do the following:
 1. From the command line run: 
@@ -43,7 +43,7 @@ By default the build pack runs grails war, which assumes the production environm
 
 If you have already pushed your app this will not automatically rebuild it, you will need to do a git push on your app in order for the changes to take affect.    
 
-4. Push the app to Heroku
+#### Push the app to Heroku
 
     $ git push heroku master
     Counting objects: 73, done.
