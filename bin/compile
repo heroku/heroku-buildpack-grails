@@ -125,8 +125,9 @@ fi
 echo "grails.dependency.cache.dir = '$CACHE_DIR/.grails_cache'" >> $HOME/.grails/settings.groovy
 
 # specify the environment - requires: heroku labs:enable user-env-compile -a myapp
-if [ $GRAILS_ENVIRONMENT ]; then
-	BUILD_ENV_OPT="-Dgrails.env=$GRAILS_ENVIRONMENT"	
+# before doing a git push of your app specify heroku config:add GRAILS_ENV=yourenvironment
+if [ $GRAILS_ENV ]; then
+	BUILD_ENV_OPT="-Dgrails.env=$GRAILS_ENV"	
 fi
 
 # build app

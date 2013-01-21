@@ -25,10 +25,22 @@ Create a Git repository for a Grails 1.3.7 or 2.0 app:
     
 Create a Heroku app on the Cedar stack
 
-    $ heroku create --stack cedar
+	Note that the following command has been modified to ensure that it uses this buildpack
+
+    $ heroku create --stack cedar --buildpack https://github.com/csherstan/heroku-buildpack-grails.git
     Creating vivid-mist-9984... done, stack is cedar
     http://vivid-mist-9984.herokuapp.com/ | git@heroku.com:vivid-mist-9984.git
     Git remote heroku added
+    
+Specifying a specific build environment
+
+	By default the build pack runs grails war, which assumes the production environment. To specify a different environment to use do the following:
+	1. From the command line run: 
+		$ heroku labs:enable user-env-compile -a myapp
+	2. From the command line run: 
+		$ heroku config:add GRAILS_ENV=myenvironment
+
+If you have already pushed your app this will not automatically rebuild it, you will need to do a git push on your app in order for the changes to take affect.    
 
 Push the app to Heroku
 
@@ -52,7 +64,7 @@ Push the app to Heroku
 
 ### Auto-detection
 
-Heroku auto-detects Grails apps by the existence of the `grails-app` directory in the project root and the `application.properties`  file is also expected to exist in the root directory. 
+Heroku auto-detects Grails apps by the existence of the `grails-app` directory in the project root and the `application.properties`  file is also expected to exist in the root directory.
 
 ### Using a Customized (Forked) Build Pack
 
