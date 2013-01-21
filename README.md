@@ -40,7 +40,8 @@ By default the build pack runs grails war, which assumes the production environm
 
 1. Make the Heroku environment variables available during build time (replace "myapp" with the Heroku name of your app) 
 
-	$ heroku labs:enable user-env-compile -a myapp
+			$ heroku labs:enable user-env-compile -a myapp
+	
 	
 2. Specify your desired environment (replace "myenvironment" with the desired environment) 
 
