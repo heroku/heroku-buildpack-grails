@@ -31,14 +31,16 @@ This is a Heroku buildpack for building and deploying Grails apps on Heroku.
     Git remote heroku added
     
 If you already have an existing app on Heroku then specify the custom buildpack like so:
+
 	$ heroku config:add BUILDPACK_URL=https://github.com/csherstan/heroku-buildpack-grails.git
     
 #### Specifying a specific build environment
 
 By default the build pack runs grails war, which assumes the production environment. To specify a different environment to use do the following:
-1. From the command line run: 
+
+1. From the command line run (replace "myapp" with the name of your app): 
 	$ heroku labs:enable user-env-compile -a myapp
-2. From the command line run: 
+2. From the command line run (replace "myenvironment" with the name of the desired environment: 
 	$ heroku config:add GRAILS_ENV=myenvironment
 
 If you have already pushed your app this will not automatically rebuild it, you will need to do a git push on your app in order for the changes to take affect.    
