@@ -142,6 +142,7 @@ testCompile_With_Wrapper() {
   local grailsVersion="2.1.0"
   createGrailsAppWithWrapper ${grailsVersion}
   assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
+  assertTrue  "Precondition: Grails wrapper should exist" "[ -f ${BUILD_DIR}/grailsw ]"
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
   compile
