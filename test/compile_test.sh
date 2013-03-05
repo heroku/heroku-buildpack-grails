@@ -54,7 +54,7 @@ createGrailsAppWithWrapper()
     cd ${GRAILS_TEST_CACHE}/${grailsVersion}
     .grails/bin/grails create-app test-app >/dev/null
     .grails/bin/grails -Dbase.dir=${GRAILS_TEST_CACHE}/${grailsVersion}/test-app wrapper >/dev/null
-    chmod +x ${GRAILS_TEST_CACHE}/${grailsVersion}/test-app/.grailsw
+    chmod +x ${GRAILS_TEST_CACHE}/${grailsVersion}/test-app/grailsw
     cd ${pwd}
   fi
 
