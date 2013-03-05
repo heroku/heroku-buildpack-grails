@@ -2,7 +2,7 @@
 
 . ${BUILDPACK_TEST_RUNNER_HOME}/lib/test_utils.sh
 
-GRAILS_TEST_CACHE="/tmp/grails_test_cache" 
+GRAILS_TEST_CACHE="/tmp/grails_test_cache"
 DEFAULT_GRAILS_VERSION="1.3.7"
 DEFAULT_JETTY_RUNNER_VERSION="7.5.4.v20111024"
 
@@ -13,13 +13,13 @@ installGrails()
 
   if [ ! -d ${GRAILS_TEST_CACHE}/${grailsVersion}/.grails ]; then
     mkdir -p ${GRAILS_TEST_CACHE}/${grailsVersion}
-    pwd="$(pwd)" 
+    pwd="$(pwd)"
     cd ${GRAILS_TEST_CACHE}/${grailsVersion}
-    curl --silent --max-time 150 --location ${grailsUrl} | tar xz  
+    curl --silent --max-time 150 --location ${grailsUrl} | tar xz
     cd ${pwd}
   fi
-  
-  [ -z "${JAVA_HOME}" ] && export JAVA_HOME=/usr/lib/jvm/java-6-openjdk    
+
+  [ -z "${JAVA_HOME}" ] && export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
 }
 
 getInstalledGrailsVersion()
@@ -32,11 +32,28 @@ createGrailsApp()
   local grailsVersion=${1:-${DEFAULT_GRAILS_VERSION}}
 
   installGrails ${grailsVersion}
-  
+
   if [ ! -d ${GRAILS_TEST_CACHE}/${grailsVersion}/test-app ]; then
     pwd="$(pwd)"
     cd ${GRAILS_TEST_CACHE}/${grailsVersion}
     .grails/bin/grails create-app test-app >/dev/null
+    cd ${pwd}
+  fi
+
+  cp -r ${GRAILS_TEST_CACHE}/${grailsVersion}/test-app/* ${BUILD_DIR}
+}
+
+createGrailsAppWithWrapper()
+{
+  local grailsVersion=${1:-${DEFAULT_GRAILS_VERSION}}
+
+  installGrails ${grailsVersion}
+
+  if [ ! -d ${GRAILS_TEST_CACHE}/${grailsVersion}/test-app ]; then
+    pwd="$(pwd)"
+    cd ${GRAILS_TEST_CACHE}/${grailsVersion}
+    .grails/bin/grails create-app test-app >/dev/null
+    .grails/bin/grails -Dbase.dir=${GRAILS_TEST_CACHE}/${grailsVersion}/test-app wrapper >/dev/null
     cd ${pwd}
   fi
 
@@ -48,8 +65,8 @@ upgradeGrailsApp()
   local grailsVersion=${1?"Grails version must be specified"}
 
   installGrails ${grailsVersion}
-  
-  pwd="$(pwd)" 
+
+  pwd="$(pwd)"
   cd ${BUILD_DIR}
   ${GRAILS_TEST_CACHE}/${grailsVersion}/.grails/bin/grails upgrade --non-interactive >/dev/null
   cd ${pwd}
@@ -92,14 +109,14 @@ testCompile_Version_1_3_7()
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
   compile
-  
+
   assertCapturedSuccess
-  assertCaptured "Grails ${grailsVersion} app detected" 
-  assertCaptured "Installing Grails ${grailsVersion}" 
+  assertCaptured "Grails ${grailsVersion} app detected"
+  assertCaptured "Installing Grails ${grailsVersion}"
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
   assertEquals "Correct Grails version should have been installed" "${grailsVersion}" "$(getInstalledGrailsVersion)"
-  assertCaptured "Grails 1.3.7 should pre-compile" "grails -Divy.default.ivy.user.dir=${CACHE_DIR} compile" 
-  assertCaptured "Grails 1.3.7 should not specify -plain-output flag" "grails  -Divy.default.ivy.user.dir=${CACHE_DIR} war" 
+  assertCaptured "Grails 1.3.7 should pre-compile" "grails -Divy.default.ivy.user.dir=${CACHE_DIR} compile"
+  assertCaptured "Grails 1.3.7 should not specify -plain-output flag" "grails  -Divy.default.ivy.user.dir=${CACHE_DIR} war"
 }
 
 testCompile_Version_2_0_0()
@@ -110,13 +127,28 @@ testCompile_Version_2_0_0()
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
   compile
-  
+
   assertCapturedSuccess
-  assertCaptured "Grails ${grailsVersion} app detected" 
-  assertCaptured "Installing Grails ${grailsVersion}" 
+  assertCaptured "Grails ${grailsVersion} app detected"
+  assertCaptured "Installing Grails ${grailsVersion}"
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
   assertEquals "Correct Grails version should have been installed" "${grailsVersion}" "$(getInstalledGrailsVersion)"
-  assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "grails -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war" 
+  assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "grails -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war"
+  assertTrue "Cache directory should have been created" "[ -d ${CACHE_DIR}/.grails_cache ]"
+}
+
+testCompile_With_Wrapper() {
+  local grailsVersion="2.1.0"
+  createGrailsAppWithWrapper ${grailsVersion}
+  assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
+  assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
+
+  compile
+
+  assertCapturedSuccess
+  assertCaptured "Grails ${grailsVersion} app detected"
+  assertFalse "Grails should not been installed" "[ -d ${CACHE_DIR}/.grails ]"
+  assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "./grailsw -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war"
   assertTrue "Cache directory should have been created" "[ -d ${CACHE_DIR}/.grails_cache ]"
 }
 
@@ -124,21 +156,21 @@ testCompile_VersionUpgrade()
 {
   local oldGrailsVersion="1.3.7"
   createGrailsApp ${oldGrailsVersion}
-  
+
   compile
 
   assertCapturedSuccess
-  assertCaptured "Grails ${oldGrailsVersion} app detected" 
-  assertCaptured "Installing Grails ${oldGrailsVersion}" 
+  assertCaptured "Grails ${oldGrailsVersion} app detected"
+  assertCaptured "Installing Grails ${oldGrailsVersion}"
 
   local newGrailsVersion="2.0.0"
   upgradeGrailsApp ${newGrailsVersion}
 
   compile
-  
+
   assertCapturedSuccess
-  assertCaptured "Grails ${newGrailsVersion} app detected" 
-  assertCaptured "Updating Grails version. Previous version was ${oldGrailsVersion}. Updating to ${newGrailsVersion}..." 
+  assertCaptured "Grails ${newGrailsVersion} app detected"
+  assertCaptured "Updating Grails version. Previous version was ${oldGrailsVersion}. Updating to ${newGrailsVersion}..."
 }
 
 testCompile_NoVersionChangeDoesNotReinstallGrails()
@@ -146,14 +178,14 @@ testCompile_NoVersionChangeDoesNotReinstallGrails()
   createGrailsApp
 
   compile
-  
+
   assertCapturedSuccess
-  assertCaptured "Installing Grails" 
+  assertCaptured "Installing Grails"
 
   compile
 
   assertCapturedSuccess
-  assertNotCaptured "Installing Grails" 
+  assertNotCaptured "Installing Grails"
 }
 
 testCompile_Version_Unknown()
@@ -167,7 +199,7 @@ testCompile_Version_Unknown()
   compile
 
   assertCapturedError "Error installing Grails framework or unsupported Grails framework version specified."
-  assertCaptured "Grails ${invalidGrailsVersion} app detected" 
+  assertCaptured "Grails ${invalidGrailsVersion} app detected"
   assertFalse "Grails should not have been installed" "[ -d ${CACHE_DIR}/.grails ]"
 }
 
@@ -177,9 +209,9 @@ testJettyRunnerInstallation()
   assertFalse "Precondition: Jetty Runner should not be installed" "[ -d ${BUILD_DIR}/server ]"
 
   compile
-  
+
   assertCapturedSuccess
-  assertCaptured "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically." 
+  assertCaptured "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically."
   assertTrue "server dir should exist" "[ -d ${BUILD_DIR}/server ]"
   assertTrue "Jetty Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/jetty-runner.jar ]"
   assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${BUILD_DIR}/server/jettyVersion)"
@@ -195,7 +227,7 @@ testJettyRunnerInstallationSkippedIfServerProvided()
   compile
 
   assertCapturedSuccess
-  assertNotCaptured "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically." 
+  assertNotCaptured "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically."
   assertFalse "[ -f ${BUILD_DIR}/server/jettyVersion ]"
   assertFalse "[ -f ${CACHE_DIR}/jettyVersion ]"
 }
