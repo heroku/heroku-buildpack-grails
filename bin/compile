@@ -144,7 +144,7 @@ if [ ! -d server ] ; then
 
     echo "-----> No server directory found. Adding jetty-runner $JETTY_RUNNER_VERSION automatically."
     mkdir server
-    cp $GRAILS_HOME/jetty-runner-$JETTY_RUNNER_VERSION.jar server/jetty-runner.jar
+    curl -fs http://s3pository.heroku.com/maven-central/org/mortbay/jetty/jetty-runner/$JETTY_RUNNER_VERSION/jetty-runner-$JETTY_RUNNER_VERSION.jar > server/jetty-runner.jar    
     echo "vendored:$JETTY_RUNNER_VERSION" > server/jettyVersion
     echo "vendored:$JETTY_RUNNER_VERSION" > $CACHE_DIR/jettyVersion
 fi
