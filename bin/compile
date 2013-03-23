@@ -140,7 +140,7 @@ eval "$BUILDCMD" | sed -u 's/^/       /'
 check_build_status
 
 if [ ! -d server ] ; then
-    SERVLET_VERSION=$(get_property $BUILD_DIR/grails-app/conf/BuildConfig.groovy 'grails.servlet.version') | sed 's/\"//g'
+    SERVLET_VERSION=$(get_property $BUILD_DIR/grails-app/conf/BuildConfig.groovy 'grails.servlet.version')
 
     if [ "$SERVLET_VERSION" == '3.0' ]; then
       JETTY_RUNNER_VERSION=8.1.10.v20130312
