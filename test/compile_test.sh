@@ -5,6 +5,7 @@
 GRAILS_TEST_CACHE="/tmp/grails_test_cache" 
 DEFAULT_GRAILS_VERSION="1.3.7"
 DEFAULT_JETTY_RUNNER_VERSION="7.5.4.v20111024"
+DEFAULT_JETTY_RUNNER_VERSION_SERVLET_3_0="8.1.10.v20130312"
 
 installGrails()
 {
@@ -184,6 +185,22 @@ testJettyRunnerInstallation()
   assertTrue "Jetty Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/jetty-runner.jar ]"
   assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${BUILD_DIR}/server/jettyVersion)"
   assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${CACHE_DIR}/jettyVersion)"
+}
+
+testJettyRunnerInstallation_Servlet3_0()
+{
+  createGrailsApp
+  echo 'grails.servlet.version = "3.0"' >> ${BUILD_DIR}/grails-app/conf/BuildConfig.groovy
+  assertFalse "Precondition: Jetty Runner should not be installed" "[ -d ${BUILD_DIR}/server ]"
+
+  compile
+  
+  assertCapturedSuccess
+  assertCaptured "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION_SERVLET_3_0} automatically." 
+  assertTrue "server dir should exist" "[ -d ${BUILD_DIR}/server ]"
+  assertTrue "Jetty Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/jetty-runner.jar ]"
+  assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION_SERVLET_3_0}" "$(cat ${BUILD_DIR}/server/jettyVersion)"
+  assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION_SERVLET_3_0}" "$(cat ${CACHE_DIR}/jettyVersion)"
 }
 
 testJettyRunnerInstallationSkippedIfServerProvided()
