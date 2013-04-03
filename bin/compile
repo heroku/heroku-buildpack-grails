@@ -65,6 +65,11 @@ if [ ! -d $CACHE_DIR ] ; then
   mkdir $CACHE_DIR
 fi
 
+# create default system.properties 
+if [ ! -f ${BUILD_DIR}/system.properties ]; then
+  echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
+fi
+
 # install JDK
 javaVersion=$(detect_java_version ${BUILD_DIR})
 echo -n "-----> Installing OpenJDK ${javaVersion}..."
@@ -145,4 +150,7 @@ if [ ! -d server ] ; then
     echo "vendored:$JETTY_RUNNER_VERSION" > $CACHE_DIR/jettyVersion
 fi
 
+PROFILE_PATH="$BUILD_DIR/.profile.d/grails.sh"
+mkdir -p $(dirname $PROFILE_PATH)
+echo 'export PATH="/app/.jdk/bin:$PATH"' >> $PROFILE_PATH
 
