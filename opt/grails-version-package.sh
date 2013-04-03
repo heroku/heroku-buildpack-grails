@@ -13,6 +13,4 @@ unzip grails-$GRAILS_VERSION.zip
 mv grails-$GRAILS_VERSION .grails
 find .grails | xargs xattr -d com.apple.quarantine
 
-curl http://repo1.maven.org/maven2/org/mortbay/jetty/jetty-runner/7.5.4.v20111024/jetty-runner-7.5.4.v20111024.jar --output .grails/jetty-runner-7.5.4.v20111024.jar
-
 tar cvzf grails-$GRAILS_VERSION.tar.gz .grails

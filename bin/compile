@@ -65,17 +65,17 @@ if [ ! -d $CACHE_DIR ] ; then
   mkdir $CACHE_DIR
 fi
 
-# install JDK
-if [ -f ${BUILD_DIR}/system.properties ]; then
-  logger -p user.notice -t "slugc[$$]" "language_pack_java download_jdk"
-  LOGGER_FLAGS="$LOGGER_FLAGS download_jdk"
-  javaVersion=$(detect_java_version ${BUILD_DIR})
-  echo -n "-----> Installing OpenJDK ${javaVersion}..."
-  install_java ${BUILD_DIR} ${javaVersion}
-  jdk_overlay ${BUILD_DIR}
-  echo "done"
-  cp ${BUILD_DIR}/system.properties ${CACHE_DIR}/
+# create default system.properties 
+if [ ! -f ${BUILD_DIR}/system.properties ]; then
+  echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
 fi
+
+# install JDK
+javaVersion=$(detect_java_version ${BUILD_DIR})
+echo -n "-----> Installing OpenJDK ${javaVersion}..."
+install_java ${BUILD_DIR} ${javaVersion}
+jdk_overlay ${BUILD_DIR}
+echo "done"
 
 cd $CACHE_DIR
 
@@ -91,12 +91,7 @@ else
   fi
 fi
 
-# This is a simplisitic way to only set JAVA_HOME when on Cedar. If you run this 
-# script locally and your jdk is not in this location, you're responsible for
-# setting it yourself. Need to find a smarter way of conditionally setting this var
-if [ -d /usr/lib/jvm/java-6-openjdk ] ; then
-    export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
-fi
+# JAVA_HOME is exported in install_java
 export GRAILS_HOME=$CACHE_DIR/$GRAILS_DIR
 export PATH=$GRAILS_HOME/bin:$PATH
 
@@ -140,13 +135,22 @@ eval "$BUILDCMD" | sed -u 's/^/       /'
 check_build_status
 
 if [ ! -d server ] ; then
-    JETTY_RUNNER_VERSION=7.5.4.v20111024
+    SERVLET_VERSION=$(get_property $BUILD_DIR/grails-app/conf/BuildConfig.groovy 'grails.servlet.version')
+
+    if [ "$SERVLET_VERSION" == '3.0' ]; then
+      JETTY_RUNNER_VERSION=8.1.10.v20130312
+    else
+      JETTY_RUNNER_VERSION=7.5.4.v20111024
+    fi
 
     echo "-----> No server directory found. Adding jetty-runner $JETTY_RUNNER_VERSION automatically."
     mkdir server
-    cp $GRAILS_HOME/jetty-runner-$JETTY_RUNNER_VERSION.jar server/jetty-runner.jar
+    curl -fs http://s3pository.heroku.com/maven-central/org/mortbay/jetty/jetty-runner/$JETTY_RUNNER_VERSION/jetty-runner-$JETTY_RUNNER_VERSION.jar > server/jetty-runner.jar    
     echo "vendored:$JETTY_RUNNER_VERSION" > server/jettyVersion
     echo "vendored:$JETTY_RUNNER_VERSION" > $CACHE_DIR/jettyVersion
 fi
 
+PROFILE_PATH="$BUILD_DIR/.profile.d/grails.sh"
+mkdir -p $(dirname $PROFILE_PATH)
+echo 'export PATH="/app/.jdk/bin:$PATH"' >> $PROFILE_PATH
 
