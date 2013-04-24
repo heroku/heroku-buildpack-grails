@@ -16,6 +16,7 @@ curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack
 . bin/java
 
 GRAILS_DIR=".grails"
+GRAILS_CMD="grails"
 
 check_build_status()
 {
@@ -79,15 +80,19 @@ echo "done"
 
 cd $CACHE_DIR
 
-# install grails
-if [ ! -d $GRAILS_DIR ]; then
-  install_grails $GRAILS_VERSION
+if [ -f $BUILD_DIR/grailsw ] ; then
+    GRAILS_CMD="./grailsw"
 else
-  INSTALLED_GRAILS_VERSION=$(get_property $GRAILS_DIR/build.properties 'grails.version')
-  if [ "$INSTALLED_GRAILS_VERSION" != "$GRAILS_VERSION" ] ; then
-    echo "-----> Updating Grails version. Previous version was $INSTALLED_GRAILS_VERSION. Updating to $GRAILS_VERSION..."
-    rm -rf $GRAILS_DIR
+  # install grails
+  if [ ! -d $GRAILS_DIR ]; then
     install_grails $GRAILS_VERSION
+  else
+    INSTALLED_GRAILS_VERSION=$(get_property $GRAILS_DIR/build.properties 'grails.version')
+    if [ "$INSTALLED_GRAILS_VERSION" != "$GRAILS_VERSION" ] ; then
+      echo "-----> Updating Grails version. Previous version was $INSTALLED_GRAILS_VERSION. Updating to $GRAILS_VERSION..."
+      rm -rf $GRAILS_DIR
+      install_grails $GRAILS_VERSION
+    fi
   fi
 fi
 
@@ -124,12 +129,12 @@ if [ "$GRAILS_VERSION" != "1.3.7" ] ; then
     BUILDCMD_OPT="-plain-output"
 fi
 
-COMPILECMD="grails -Divy.default.ivy.user.dir=$CACHE_DIR compile --non-interactive"
+COMPILECMD="$GRAILS_CMD -Divy.default.ivy.user.dir=$CACHE_DIR compile --non-interactive"
 echo "-----> Executing $COMPILECMD"
 eval "$COMPILECMD" | sed -u 's/^/       /'
 check_build_status
 
-BUILDCMD="grails $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war --non-interactive"
+BUILDCMD="$GRAILS_CMD $BUILDCMD_OPT -Divy.default.ivy.user.dir=$CACHE_DIR war --non-interactive"
 echo "-----> Executing $BUILDCMD"
 eval "$BUILDCMD" | sed -u 's/^/       /'
 check_build_status
