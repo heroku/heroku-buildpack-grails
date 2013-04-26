@@ -140,19 +140,13 @@ eval "$BUILDCMD" | sed -u 's/^/       /'
 check_build_status
 
 if [ ! -d server ] ; then
-    SERVLET_VERSION=$(get_property $BUILD_DIR/grails-app/conf/BuildConfig.groovy 'grails.servlet.version')
+    WEBAPP_RUNNER_VERSION=7.0.34.3
 
-    if [ "$SERVLET_VERSION" == '3.0' ]; then
-      JETTY_RUNNER_VERSION=8.1.10.v20130312
-    else
-      JETTY_RUNNER_VERSION=7.5.4.v20111024
-    fi
-
-    echo "-----> No server directory found. Adding jetty-runner $JETTY_RUNNER_VERSION automatically."
+    echo "-----> No server directory found. Adding webapp-runner $WEBAPP_RUNNER_VERSION automatically."
     mkdir server
-    curl -fs http://s3pository.heroku.com/maven-central/org/mortbay/jetty/jetty-runner/$JETTY_RUNNER_VERSION/jetty-runner-$JETTY_RUNNER_VERSION.jar > server/jetty-runner.jar    
-    echo "vendored:$JETTY_RUNNER_VERSION" > server/jettyVersion
-    echo "vendored:$JETTY_RUNNER_VERSION" > $CACHE_DIR/jettyVersion
+    curl -fs http://s3pository.heroku.com/maven-central/com/github/jsimone/webapp-runner/$WEBAPP_RUNNER_VERSION/webapp-runner-$WEBAPP_RUNNER_VERSION.jar > server/webapp-runner.jar    
+    echo "vendored:webapp-runner:$WEBAPP_RUNNER_VERSION" > server/webappRunnerVersion
+    echo "vendored:webapp-runner:$WEBAPP_RUNNER_VERSION" > $CACHE_DIR/webappRunnerVersion
 fi
 
 PROFILE_PATH="$BUILD_DIR/.profile.d/grails.sh"
