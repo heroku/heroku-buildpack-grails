@@ -5,7 +5,7 @@
 GRAILS_TEST_CACHE="/tmp/grails_test_cache"
 DEFAULT_GRAILS_VERSION="1.3.7"
 DEFAULT_JETTY_RUNNER_VERSION="7.5.4.v20111024"
-DEFAULT_JETTY_RUNNER_VERSION_SERVLET_3_0="8.1.10.v20130312"
+DEFAULT_WEBAPP_RUNNER_VERSION="7.0.34.3"
 
 installGrails()
 {
@@ -206,10 +206,12 @@ testCompile_Version_Unknown()
   assertFalse "Grails should not have been installed" "[ -d ${CACHE_DIR}/.grails ]"
 }
 
-testJettyRunnerInstallation()
+testJettyRunnerLegacyReinstallation()
 {
   createGrailsApp
-  assertFalse "Precondition: Jetty Runner should not be installed" "[ -d ${BUILD_DIR}/server ]"
+  echo "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" > ${CACHE_DIR}/jettyVersion
+  assertFalse "Precondition: No server directory should be present" "[ -d ${BUILD_DIR}/server ]"
+  assertTrue  "Precondition: Jetty Runner vendor file should be in cache" "[ -f ${CACHE_DIR}/jettyVersion ]"
 
   compile
 
@@ -221,20 +223,20 @@ testJettyRunnerInstallation()
   assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${CACHE_DIR}/jettyVersion)"
 }
 
-testJettyRunnerInstallation_Servlet3_0()
+testWebappRunnerInstallation()
 {
   createGrailsApp
-  echo 'grails.servlet.version = "3.0"' >> ${BUILD_DIR}/grails-app/conf/BuildConfig.groovy
-  assertFalse "Precondition: Jetty Runner should not be installed" "[ -d ${BUILD_DIR}/server ]"
+  assertFalse "Precondition: No server directory should be present" "[ -d ${BUILD_DIR}/server ]"
+  assertFalse "Precondition: Jetty Runner vendor file should not be in cache" "[ -f ${CACHE_DIR}/jettyVersion ]"  
 
   compile
-  
+
   assertCapturedSuccess
-  assertCaptured "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION_SERVLET_3_0} automatically." 
+  assertCaptured "No server directory found. Adding webapp-runner ${DEFAULT_WEBAPP_RUNNER_VERSION} automatically."
   assertTrue "server dir should exist" "[ -d ${BUILD_DIR}/server ]"
-  assertTrue "Jetty Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/jetty-runner.jar ]"
-  assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION_SERVLET_3_0}" "$(cat ${BUILD_DIR}/server/jettyVersion)"
-  assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION_SERVLET_3_0}" "$(cat ${CACHE_DIR}/jettyVersion)"
+  assertTrue "Webapp Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/webapp-runner.jar ]"
+  assertEquals "vendored:${DEFAULT_WEBAPP_RUNNER_VERSION}" "$(cat ${BUILD_DIR}/server/webappRunnerVersion)"
+  assertEquals "vendored:${DEFAULT_WEBAPP_RUNNER_VERSION}" "$(cat ${CACHE_DIR}/webappRunnerVersion)"
 }
 
 testJettyRunnerInstallationSkippedIfServerProvided()
@@ -246,9 +248,12 @@ testJettyRunnerInstallationSkippedIfServerProvided()
   compile
 
   assertCapturedSuccess
-  assertNotCaptured "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically."
+  assertNotCaptured "No server directory found. Adding jetty-runner"
+  assertNotCaptured "No server directory found. Adding webapp-runner"
   assertFalse "[ -f ${BUILD_DIR}/server/jettyVersion ]"
+  assertFalse "[ -f ${BUILD_DIR}/server/webappRunnerVersion ]"
   assertFalse "[ -f ${CACHE_DIR}/jettyVersion ]"
+  assertFalse "[ -f ${CACHE_DIR}/webappRunnerVersion ]"
 }
 
 testCompliationFailsWhenApplicationPropertiesIsMissing()
