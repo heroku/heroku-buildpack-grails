@@ -218,6 +218,7 @@ testJettyRunnerLegacyReinstallation()
   assertCapturedSuccess
   assertCaptured "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically."
   assertTrue "server dir should exist" "[ -d ${BUILD_DIR}/server ]"
+  assertFileContains "defaultRunnerJar should be jetty-runner.jar" "server/jetty-runner.jar" ${BUILD_DIR}/server/defaultRunnerJar
   assertTrue "Jetty Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/jetty-runner.jar ]"
   assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${BUILD_DIR}/server/jettyVersion)"
   assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${CACHE_DIR}/jettyVersion)"
@@ -234,6 +235,7 @@ testWebappRunnerInstallation()
   assertCapturedSuccess
   assertCaptured "No server directory found. Adding webapp-runner ${DEFAULT_WEBAPP_RUNNER_VERSION} automatically."
   assertTrue "server dir should exist" "[ -d ${BUILD_DIR}/server ]"
+  assertFileContains "defaultRunnerJar should be webapp-runner.jar" "server/webapp-runner.jar" ${BUILD_DIR}/server/defaultRunnerJar
   assertTrue "Webapp Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/webapp-runner.jar ]"
   assertEquals "vendored:${DEFAULT_WEBAPP_RUNNER_VERSION}" "$(cat ${BUILD_DIR}/server/webappRunnerVersion)"
   assertEquals "vendored:${DEFAULT_WEBAPP_RUNNER_VERSION}" "$(cat ${CACHE_DIR}/webappRunnerVersion)"
@@ -252,6 +254,7 @@ testJettyRunnerInstallationSkippedIfServerProvided()
   assertNotCaptured "No server directory found. Adding webapp-runner"
   assertFalse "[ -f ${BUILD_DIR}/server/jettyVersion ]"
   assertFalse "[ -f ${BUILD_DIR}/server/webappRunnerVersion ]"
+  assertFalse "[ -f ${BUILD_DIR}/server/defaultRunnerJar ]"
   assertFalse "[ -f ${CACHE_DIR}/jettyVersion ]"
   assertFalse "[ -f ${CACHE_DIR}/webappRunnerVersion ]"
 }
