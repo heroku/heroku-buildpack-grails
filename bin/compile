@@ -159,3 +159,7 @@ PROFILE_PATH="$BUILD_DIR/.profile.d/grails.sh"
 mkdir -p $(dirname $PROFILE_PATH)
 echo 'export PATH="/app/.jdk/bin:$PATH"' >> $PROFILE_PATH
 
+echo "-----> Compiling runner"
+$JAVA_HOME/bin/javac -d $BUILD_DIR/server -cp $BUILD_DIR/server/jetty-runner.jar $BIN_DIR/../server/*.java
+
+
