@@ -229,7 +229,7 @@ testJettyRunnerSelection()
   createGrailsApp
   echo "grails.application.container=jetty" > ${BUILD_DIR}/system.properties
   assertFalse "Precondition: No server directory should be present" "[ -d ${BUILD_DIR}/server ]"
-  assertTrue  "Precondition: system.properties file should be in cache" "[ -f ${CACHE_DIR}/system.properties ]"
+  assertTrue  "Precondition: system.properties file should be in build dir" "[ -f ${BUILD_DIR}/system.properties ]"
 
   compile
 
