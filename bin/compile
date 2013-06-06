@@ -143,7 +143,7 @@ if [ ! -d server ] ; then
 
     mkdir server
 
-    if [ -f $CACHE_DIR/jettyVersion ] ; then
+    if [[ "jetty" == "$(get_app_system_value ${baseDir}/system.properties grails.application.container)" ||  -f $CACHE_DIR/jettyVersion ]] ; then
 	JETTY_RUNNER_VERSION=$(cat $CACHE_DIR/jettyVersion | sed "s/vendored://g")
         echo "-----> No server directory found. Adding jetty-runner $JETTY_RUNNER_VERSION automatically."
         DEFAULT_RUNNER_JAR=server/jetty-runner.jar
