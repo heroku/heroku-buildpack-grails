@@ -224,6 +224,24 @@ testJettyRunnerLegacyReinstallation()
   assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${CACHE_DIR}/jettyVersion)"
 }
 
+testJettyRunnerSelection()
+{
+  createGrailsApp
+  echo "grails.application.container=jetty" > ${BUILD_DIR}/system.properties
+  assertFalse "Precondition: No server directory should be present" "[ -d ${BUILD_DIR}/server ]"
+  assertTrue  "Precondition: system.properties file should be in cache" "[ -f ${CACHE_DIR}/system.properties ]"
+
+  compile
+
+  assertCapturedSuccess
+  assertCaptured "No server directory found. Adding jetty-runner ${DEFAULT_JETTY_RUNNER_VERSION} automatically."
+  assertTrue "server dir should exist" "[ -d ${BUILD_DIR}/server ]"
+  assertFileContains "defaultRunnerJar should be jetty-runner.jar" "server/jetty-runner.jar" ${BUILD_DIR}/server/defaultRunnerJar
+  assertTrue "Jetty Runner should be installed in server dir" "[ -f ${BUILD_DIR}/server/jetty-runner.jar ]"
+  assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${BUILD_DIR}/server/jettyVersion)"
+  assertEquals "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" "$(cat ${CACHE_DIR}/jettyVersion)"
+}
+
 testWebappRunnerInstallation()
 {
   createGrailsApp
