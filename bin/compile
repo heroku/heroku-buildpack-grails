@@ -143,7 +143,7 @@ if [ ! -d server ] ; then
 
     mkdir server
 
-    if [ "jetty" == "$(get_app_system_value ${BUILD_DIR}/system.properties grails.application.container)" ] ; then
+    if [ "jetty" == "$(get_property ${BUILD_DIR}/system.properties grails.application.container)" ] ; then
       SERVLET_VERSION=$(get_property $BUILD_DIR/grails-app/conf/BuildConfig.groovy 'grails.servlet.version')
 
       if [ "$SERVLET_VERSION" == '3.0' ]; then
