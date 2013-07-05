@@ -46,7 +46,7 @@ install_grails()
   fi
 
   #use jar because unzip isn't available
-  jar xvf $GRAILS_ZIP_FILE
+  jar xf $GRAILS_ZIP_FILE
   rm $GRAILS_ZIP_FILE
   #copy to standard dir location
   mv grails-$VER_TO_INSTALL $GRAILS_DIR

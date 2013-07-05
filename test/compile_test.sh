@@ -10,13 +10,16 @@ DEFAULT_WEBAPP_RUNNER_VERSION="7.0.40.0"
 installGrails()
 {
   local grailsVersion=${1:-${DEFAULT_GRAILS_VERSION}}
-  local grailsUrl="http://s3.amazonaws.com/heroku-jvm-buildpack-grails/grails-${grailsVersion}.tar.gz"
+  local grailsUrl="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/grails-${grailsVersion}.zip"
 
   if [ ! -d ${GRAILS_TEST_CACHE}/${grailsVersion}/.grails ]; then
     mkdir -p ${GRAILS_TEST_CACHE}/${grailsVersion}
     pwd="$(pwd)"
     cd ${GRAILS_TEST_CACHE}/${grailsVersion}
-    curl --silent --max-time 150 --location ${grailsUrl} | tar xz
+    curl --silent --max-time 150 --location ${grailsUrl} -o grails.zip
+    jar xf grails.zip
+    mv grails-${grailsVersion} .grails
+    chmod +x .grails/bin/grails
     cd ${pwd}
   fi
 
