@@ -29,24 +29,29 @@ check_build_status()
 install_grails()
 {
   VER_TO_INSTALL=$1
-  GRAILS_URL="http://s3.amazonaws.com/heroku-jvm-buildpack-grails/grails-$VER_TO_INSTALL.tar.gz"
+  GRAILS_URL="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/grails-$VER_TO_INSTALL.zip"
 
-  GRAILS_TAR_FILE="grails-heroku.tar.gz"
+  GRAILS_ZIP_FILE="grails-heroku.zip"
   echo "-----> Installing Grails $VER_TO_INSTALL....."
-  curl --silent --max-time 150 --location $GRAILS_URL -o $GRAILS_TAR_FILE
+  curl --silent --max-time 150 --location $GRAILS_URL -o $GRAILS_ZIP_FILE
 
   # Error checking
-  if [ ! -f $GRAILS_TAR_FILE ]; then
+  if [ ! -f $GRAILS_ZIP_FILE ]; then
     echo "-----> Error downloading Grails framework. Please try again..."
     exit 1
   fi
-  if [ -z "`file $GRAILS_TAR_FILE | grep gzip`" ]; then
+  if [ -z "`file $GRAILS_ZIP_FILE | grep Zip`" ]; then
     echo "-----> Error installing Grails framework or unsupported Grails framework version specified. Please review Dev Center for a list of supported versions."
     exit 1
   fi
 
-  tar xzf $GRAILS_TAR_FILE
-  rm $GRAILS_TAR_FILE
+  #use jar because unzip isn't available
+  jar xf $GRAILS_ZIP_FILE
+  rm $GRAILS_ZIP_FILE
+  #copy to standard dir location
+  mv grails-$VER_TO_INSTALL $GRAILS_DIR
+  #make grails command executable
+  chmod +x $GRAILS_DIR/bin/grails
 
   echo "-----> Done"
 }
@@ -162,7 +167,7 @@ if [ ! -d server ] ; then
         curl -fs http://s3pository.heroku.com/maven-central/org/mortbay/jetty/jetty-runner/$JETTY_RUNNER_VERSION/jetty-runner-$JETTY_RUNNER_VERSION.jar > $DEFAULT_RUNNER_JAR
         echo "vendored:$JETTY_RUNNER_VERSION" > server/jettyVersion
     else
-        WEBAPP_RUNNER_VERSION=7.0.34.3
+        WEBAPP_RUNNER_VERSION=7.0.40.0
 	echo "-----> No server directory found. Adding webapp-runner $WEBAPP_RUNNER_VERSION automatically."
         DEFAULT_RUNNER_JAR=server/webapp-runner.jar
         curl -fs http://s3pository.heroku.com/maven-central/com/github/jsimone/webapp-runner/$WEBAPP_RUNNER_VERSION/webapp-runner-$WEBAPP_RUNNER_VERSION.jar > $DEFAULT_RUNNER_JAR
