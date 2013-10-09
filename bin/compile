@@ -86,6 +86,7 @@ echo "done"
 cd $CACHE_DIR
 
 if [ -f $BUILD_DIR/grailsw ] ; then
+    chmod +x $BUILD_DIR/grailsw
     GRAILS_CMD="./grailsw"
 else
   # install grails
