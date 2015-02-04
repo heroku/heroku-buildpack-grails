@@ -23,7 +23,7 @@ installGrails()
     cd ${pwd}
   fi
 
-  [ -z "${JAVA_HOME}" ] && export JAVA_HOME=/usr/lib/jvm/java-6-openjdk
+  [ -z "${JAVA_HOME}" ] && export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64
 }
 
 getInstalledGrailsVersion()
@@ -138,7 +138,7 @@ testCompile_Version_2_0_0()
   assertCaptured "Installing Grails ${grailsVersion}"
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
   assertEquals "Correct Grails version should have been installed" "${grailsVersion}" "$(getInstalledGrailsVersion)"
-  assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "grails -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war"
+  assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "grails  -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war"
   assertTrue "Cache directory should have been created" "[ -d ${CACHE_DIR}/.grails_cache ]"
 }
 
@@ -154,7 +154,7 @@ testCompile_With_Wrapper() {
   assertCapturedSuccess
   assertCaptured "Grails ${grailsVersion} app detected"
   assertFalse "Grails should not been installed" "[ -d ${CACHE_DIR}/.grails ]"
-  assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "./grailsw -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war"
+  assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "./grailsw  -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war"
   assertTrue "Cache directory should have been created" "[ -d ${CACHE_DIR}/.grails_cache ]"
 }
 
