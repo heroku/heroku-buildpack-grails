@@ -1,6 +1,6 @@
 # Heroku buildpack: Grails
 
-This is a Heroku buildpack for building and deploying Grails apps on Heroku.
+This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for building and deploying Grails apps on Heroku.
 
 ## Usage
 
@@ -23,9 +23,9 @@ Create a Git repository for a Grails 1.3.7 or 2.0 app:
      create mode 100644 application.properties
     ...
     
-Create a Heroku app on the Cedar stack
+Create a Heroku app
 
-    $ heroku create --stack cedar
+    $ heroku create
     Creating vivid-mist-9984... done, stack is cedar
     http://vivid-mist-9984.herokuapp.com/ | git@heroku.com:vivid-mist-9984.git
     Git remote heroku added
@@ -58,7 +58,7 @@ Heroku auto-detects Grails apps by the existence of the `grails-app` directory i
 
 This is the default buildpack repository for Grails. You can fork this repo and tell Heroku to use the forked version by passing the `--buildpack` option to `heroku create`:
 
-    $ heroku create --stack cedar --buildpack http://github.com/jesperfj/heroku-buildpack-grails.git
+    $ heroku create --buildpack http://github.com/jesperfj/heroku-buildpack-grails.git
 
 ## License
 
