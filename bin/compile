@@ -177,7 +177,7 @@ if [ ! -d server ] ; then
         curl -fs http://s3pository.heroku.com/maven-central/org/mortbay/jetty/jetty-runner/$JETTY_RUNNER_VERSION/jetty-runner-$JETTY_RUNNER_VERSION.jar > $DEFAULT_RUNNER_JAR
         echo "vendored:$JETTY_RUNNER_VERSION" > server/jettyVersion
     else
-        WEBAPP_RUNNER_VERSION=7.0.40.0
+        WEBAPP_RUNNER_VERSION=7.0.57.2
 	echo "-----> No server directory found. Adding webapp-runner $WEBAPP_RUNNER_VERSION automatically."
         DEFAULT_RUNNER_JAR=server/webapp-runner.jar
         curl -fs http://s3pository.heroku.com/maven-central/com/github/jsimone/webapp-runner/$WEBAPP_RUNNER_VERSION/webapp-runner-$WEBAPP_RUNNER_VERSION.jar > $DEFAULT_RUNNER_JAR
