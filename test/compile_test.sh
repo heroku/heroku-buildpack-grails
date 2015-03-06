@@ -231,6 +231,7 @@ testJettyRunnerSelection()
 {
   createGrailsApp
   echo "grails.application.container=jetty" > ${BUILD_DIR}/system.properties
+  echo "java.runtime.version=1.6" >> ${BUILD_DIR}/system.properties
   assertFalse "Precondition: No server directory should be present" "[ -d ${BUILD_DIR}/server ]"
   assertTrue  "Precondition: system.properties file should be in build dir" "[ -f ${BUILD_DIR}/system.properties ]"
 

@@ -13,9 +13,11 @@ ENV_DIR=$3
 # source in common functions
 . $BIN_DIR/common.sh
 
-curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
-. bin/util
-. bin/java
+JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-https://codon-buildpacks.s3.amazonaws.com/buildpacks/heroku/jvm-common.tgz}
+mkdir -p /tmp/jvm-common
+curl --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common --strip-components=1
+. /tmp/jvm-common/bin/util
+. /tmp/jvm-common/bin/java
 
 export_env_dir $ENV_DIR
 
@@ -65,7 +67,7 @@ if [ ! -f $BUILD_DIR/application.properties ] ; then
     echo " !     Failed to build app"
     exit 1
 fi
-    
+
 GRAILS_VERSION=$(get_property $BUILD_DIR/application.properties 'app.grails.version')
 
 echo "-----> Grails $GRAILS_VERSION app detected"
