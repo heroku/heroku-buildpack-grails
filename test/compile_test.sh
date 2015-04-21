@@ -110,7 +110,7 @@ testCompile_Version_1_3_7()
 {
   local grailsVersion="1.3.7"
   createGrailsApp ${grailsVersion}
-  echo "java.runtime.version=1.7" > ${BUILD_DIR}/system.properties
+  echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
   assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
 
@@ -162,7 +162,7 @@ testCompile_With_Wrapper() {
 testCompile_VersionUpgrade()
 {
   local oldGrailsVersion="1.3.7"
-  echo "java.runtime.version=1.7" > ${BUILD_DIR}/system.properties
+  echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
   createGrailsApp ${oldGrailsVersion}
 
   compile
