@@ -34,7 +34,7 @@ addons:
   heroku-postgresql:dev
 
 default_process_types:
-  web:      java \\$JAVA_OPTS -jar DEFAULT_RUNNER.JAR --expand-war \\$RUNNER_OPTS --port \\$PORT target/*.war
+  web:      java \\$JAVA_OPTS -jar DEFAULT_RUNNER.JAR --expand-war \\$RUNNER_OPTS --port \\$PORT --uri-encoding UTF-8 target/*.war
 
 EOF`
 
