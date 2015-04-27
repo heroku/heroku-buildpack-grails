@@ -16,6 +16,6 @@ if [ -f $BUILD_DIR/server/defaultRunnerJar ]; then
   cat <<EOF
 
 default_process_types:
-  web:      java \$JAVA_OPTS -jar $(cat $BUILD_DIR/server/defaultRunnerJar) --expand-war \$RUNNER_OPTS --port \$PORT target/*.war
+  web:      java \$JAVA_OPTS -jar $(cat $BUILD_DIR/server/defaultRunnerJar) --expand-war \$RUNNER_OPTS --port \$PORT --uri-encoding UTF-8 target/*.war
 EOF
 fi
