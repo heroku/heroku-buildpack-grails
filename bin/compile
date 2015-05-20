@@ -77,7 +77,7 @@ if [ ! -d $CACHE_DIR ] ; then
   mkdir $CACHE_DIR
 fi
 
-# create default system.properties 
+# create default system.properties
 if [ ! -f ${BUILD_DIR}/system.properties ]; then
   echo "java.runtime.version=1.7" > ${BUILD_DIR}/system.properties
 fi
@@ -137,8 +137,8 @@ fi
 echo "grails.dependency.cache.dir = '$CACHE_DIR/.grails_cache'" >> $HOME/.grails/settings.groovy
 
 # before doing a git push of your app specify heroku config:add GRAILS_ENV=yourenvironment
-if [ $GRAILS_ENV ]; then
-	BUILDCMD_OPT="$BUILDCMD_OPT -Dgrails.env=$GRAILS_ENV"
+if [ -n "$GRAILS_ENV" ]; then
+  BUILDCMD_OPT="$BUILDCMD_OPT -Dgrails.env=$GRAILS_ENV"
 fi
 
 # build app
@@ -193,4 +193,3 @@ fi
 PROFILE_PATH="$BUILD_DIR/.profile.d/grails.sh"
 mkdir -p $(dirname $PROFILE_PATH)
 echo 'export PATH="/app/.jdk/bin:$PATH"' >> $PROFILE_PATH
-
