@@ -293,7 +293,7 @@ testCompliationFailsWhenApplicationPropertiesIsMissing()
 
   compile
 
-  assertCapturedError "File not found: application.properties. This file is required. Build failed."
+  assertCapturedError "File not found: application.properties. This file is required."
 }
 
 testCheckBuildStatus()
