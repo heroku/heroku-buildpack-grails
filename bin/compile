@@ -27,9 +27,21 @@ GRAILS_CMD="grails"
 check_build_status()
 {
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
-    echo " !     Failed to build app"
-    exit 1
+    error_build_failed
   fi
+}
+
+error_build_failed()
+{
+  error "Failed to build app!
+We're sorry this build is failing! If you can't find the issue in application
+code, please submit a ticket so we can help: https://help.heroku.com
+You can also try reverting to our legacy Grails buildpack:
+
+  $ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-grails#legacy
+
+Thanks,
+Heroku"
 }
 
 install_grails()
@@ -63,9 +75,8 @@ install_grails()
 }
 
 if [ ! -f $BUILD_DIR/application.properties ] ; then
-    echo "-----> File not found: application.properties. This file is required. Build failed."
-    echo " !     Failed to build app"
-    exit 1
+    echo "-----> File not found: application.properties. This file is required."
+    error_build_failed
 fi
 
 GRAILS_VERSION=$(get_property $BUILD_DIR/application.properties 'app.grails.version')
