@@ -16,7 +16,7 @@ installGrails()
     mkdir -p ${GRAILS_TEST_CACHE}/${grailsVersion}
     pwd="$(pwd)"
     cd ${GRAILS_TEST_CACHE}/${grailsVersion}
-    curl --silent --max-time 150 --location ${grailsUrl} -o grails.zip
+    curl --silent --location ${grailsUrl} -o grails.zip
     jar xf grails.zip
     mv grails-${grailsVersion} .grails
     chmod +x .grails/bin/grails
@@ -213,8 +213,9 @@ testCompile_Version_Unknown()
 
 testJettyRunnerLegacyReinstallation()
 {
-  createGrailsApp
+  createGrailsApp "1.3.7"
   echo "vendored:${DEFAULT_JETTY_RUNNER_VERSION}" > ${CACHE_DIR}/jettyVersion
+  echo "java.runtime.version=1.6" >> ${BUILD_DIR}/system.properties
   assertFalse "Precondition: No server directory should be present" "[ -d ${BUILD_DIR}/server ]"
   assertTrue  "Precondition: Jetty Runner vendor file should be in cache" "[ -f ${CACHE_DIR}/jettyVersion ]"
 
@@ -231,7 +232,7 @@ testJettyRunnerLegacyReinstallation()
 
 testJettyRunnerSelection()
 {
-  createGrailsApp
+  createGrailsApp "1.3.7"
   echo "grails.application.container=jetty" > ${BUILD_DIR}/system.properties
   echo "java.runtime.version=1.6" >> ${BUILD_DIR}/system.properties
   assertFalse "Precondition: No server directory should be present" "[ -d ${BUILD_DIR}/server ]"
@@ -250,9 +251,10 @@ testJettyRunnerSelection()
 
 testWebappRunnerInstallation()
 {
-  createGrailsApp
+  createGrailsApp "1.3.7"
+  echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
   assertFalse "Precondition: No server directory should be present" "[ -d ${BUILD_DIR}/server ]"
-  assertFalse "Precondition: Jetty Runner vendor file should not be in cache" "[ -f ${CACHE_DIR}/jettyVersion ]"  
+  assertFalse "Precondition: Jetty Runner vendor file should not be in cache" "[ -f ${CACHE_DIR}/jettyVersion ]"
 
   compile
 
@@ -267,7 +269,8 @@ testWebappRunnerInstallation()
 
 testJettyRunnerInstallationSkippedIfServerProvided()
 {
-  createGrailsApp
+  createGrailsApp "1.3.7"
+  echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
   mkdir -p ${BUILD_DIR}/server
   assertTrue "Precondition: Custom server should be included in app" "[ -d ${BUILD_DIR}/server ]"
 
@@ -295,8 +298,8 @@ testCompliationFailsWhenApplicationPropertiesIsMissing()
 
 testCheckBuildStatus()
 {
-  createGrailsApp
-  rm -r ${BUILD_DIR}/grails-app/* # delete contents of app to pass detection, but fail the build
+  createGrailsApp "1.3.7"
+  rm -rf ${BUILD_DIR}/grails-app/* # delete contents of app to pass detection, but fail the build
 
   compile
 
