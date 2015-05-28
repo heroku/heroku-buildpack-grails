@@ -196,6 +196,7 @@ if [ ! -d server ] ; then
         curl -fs http://s3pository.heroku.com/maven-central/com/github/jsimone/webapp-runner/$WEBAPP_RUNNER_VERSION/webapp-runner-$WEBAPP_RUNNER_VERSION.jar > $DEFAULT_RUNNER_JAR
       	echo "vendored:$WEBAPP_RUNNER_VERSION" > server/webappRunnerVersion
       	echo "vendored:$WEBAPP_RUNNER_VERSION" > $CACHE_DIR/webappRunnerVersion
+        echo "export RUNNER_OPTS=\"\$RUNNER_OPTS --expand-war --uri-encoding UTF-8\"" > .profile.d/grails.sh
     fi
 
     echo "$DEFAULT_RUNNER_JAR" > server/defaultRunnerJar
