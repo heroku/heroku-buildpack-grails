@@ -1,5 +1,7 @@
 # Heroku buildpack: Grails [![Build Status](https://travis-ci.org/heroku/heroku-buildpack-grails.svg?branch=master)](https://travis-ci.org/heroku/heroku-buildpack-grails)
 
+![](https://cloud.githubusercontent.com/assets/51578/11048146/2e0d0a3e-8704-11e5-9f87-79df54f313cc.jpg)
+
 This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for building and deploying Grails apps on Heroku.
 
 ## Usage
