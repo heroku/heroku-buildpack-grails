@@ -67,10 +67,9 @@ install_grails()
 
   status=$(curl --retry 3 --silent --head -w %{http_code} -L ${GRAILS_URL} -o /dev/null)
   if [ "$status" != "200" ]; then
-    curl --retry 3 -s --max-time 150 -L $GRAILS_ALT_URL -o $GRAILS_ZIP_FILE
-  else
-    curl --retry 3 --silent --max-time 150 --location $GRAILS_URL -o $GRAILS_ZIP_FILE
+    GRAILS_URL=${GRAILS_ALT_URL}
   fi
+  curl --retry 3 --silent --max-time 150 --location $GRAILS_URL -o $GRAILS_ZIP_FILE
 
   # Error checking
   if [ ! -f $GRAILS_ZIP_FILE ]; then
