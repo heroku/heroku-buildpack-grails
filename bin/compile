@@ -44,14 +44,33 @@ Thanks,
 Heroku"
 }
 
+validate_grails_version() {
+  local grailsVersion=${1}
+
+  if [[ "${grailsVersion}" =~ ^3.* ]]; then
+    error "Unsupported version!
+Grails 3 requires the Gradle buildpack. For more information see:
+https://devcenter.heroku.com/articles/deploying-gradle-apps-on-heroku"
+  fi
+}
+
 install_grails()
 {
   VER_TO_INSTALL=$1
   GRAILS_URL="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/grails-$VER_TO_INSTALL.zip"
+  GRAILS_ALT_URL="https://github.com/grails/grails-core/releases/download/v${VER_TO_INSTALL}/grails-${VER_TO_INSTALL}.zip"
+
+  validate_grails_version $VER_TO_INSTALL
 
   GRAILS_ZIP_FILE="grails-heroku.zip"
   echo "-----> Installing Grails $VER_TO_INSTALL....."
-  curl --silent --max-time 150 --location $GRAILS_URL -o $GRAILS_ZIP_FILE
+
+  status=$(curl --retry 3 --silent --head -w %{http_code} -L ${GRAILS_URL} -o /dev/null)
+  if [ "$status" != "200" ]; then
+    curl --retry 3 -s --max-time 150 -L $GRAILS_ALT_URL -o $GRAILS_ZIP_FILE
+  else
+    curl --retry 3 --silent --max-time 150 --location $GRAILS_URL -o $GRAILS_ZIP_FILE
+  fi
 
   # Error checking
   if [ ! -f $GRAILS_ZIP_FILE ]; then
