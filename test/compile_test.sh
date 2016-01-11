@@ -10,7 +10,6 @@ DEFAULT_WEBAPP_RUNNER_VERSION="7.0.57.2"
 installGrails()
 {
   local grailsVersion=${1:-${DEFAULT_GRAILS_VERSION}}
-  #local grailsUrl="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/grails-${grailsVersion}.zip"
   local grailsUrl="https://github.com/grails/grails-core/releases/download/v${grailsVersion}/grails-${grailsVersion}.zip"
 
   if [ ! -d ${GRAILS_TEST_CACHE}/${grailsVersion}/.grails ]; then
@@ -152,7 +151,7 @@ testCompile_Version_2_0_0()
   assertTrue "Cache directory should have been created" "[ -d ${CACHE_DIR}/.grails_cache ]"
 }
 
-testCompile_VersionWithAltURL()
+testCompile_Version_2_5_2()
 {
   local grailsVersion="2.5.2"
   createGrailsApp ${grailsVersion}
@@ -163,10 +162,8 @@ testCompile_VersionWithAltURL()
 
   assertCapturedSuccess
   assertCaptured "Grails app was not detect" "Grails ${grailsVersion} app detected"
-  assertCaptured "Grails install was not logged" "Installing Grails ${grailsVersion}"
-  assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
-  assertEquals "Correct Grails version should have been installed" "${grailsVersion}" "$(getInstalledGrailsVersion)"
-  assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "grails  -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war"
+  assertFalse "Grails should not been installed" "[ -d ${CACHE_DIR}/.grails ]"
+  assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "./grailsw  -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war"
   assertTrue "Cache directory should have been created" "[ -d ${CACHE_DIR}/.grails_cache ]"
 }
 
