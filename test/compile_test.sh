@@ -146,7 +146,7 @@ testCompile_Version_2_0_0()
 
 testCompile_VersionWithAltURL()
 {
-  local grailsVersion="2.5.3"
+  local grailsVersion="2.5.2"
   createGrailsApp ${grailsVersion}
   assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
   assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
