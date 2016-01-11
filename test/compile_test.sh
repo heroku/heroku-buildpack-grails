@@ -162,8 +162,8 @@ testCompile_VersionWithAltURL()
   compile
 
   assertCapturedSuccess
-  assertCaptured "Grails ${grailsVersion} app detected"
-  assertCaptured "Installing Grails ${grailsVersion}"
+  assertCaptured "Grails app was not detect" "Grails ${grailsVersion} app detected"
+  assertCaptured "Grails install was not logged" "Installing Grails ${grailsVersion}"
   assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
   assertEquals "Correct Grails version should have been installed" "${grailsVersion}" "$(getInstalledGrailsVersion)"
   assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "grails  -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war"
