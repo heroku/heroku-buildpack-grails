@@ -44,9 +44,11 @@ createGrailsApp()
     .grails/bin/grails create-app test-app >/dev/null
 
     # fix bug in grails wrapper
-    sed -i.bak \
+    if [ -f test-app/wrapper/grails-wrapper.properties ]; then
+      sed -i.bak \
         s/http:\\\/\\\/dist.springframework.org.s3.amazonaws.com\\\/release\\\/GRAILS/https:\\\/\\\/github.com\\\/grails\\\/grails-core\\\/releases\\\/download\\\/v${grailsVersion}/g \
         test-app/wrapper/grails-wrapper.properties
+    fi
 
     cd ${pwd}
   fi
