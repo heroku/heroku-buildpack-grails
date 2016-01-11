@@ -10,7 +10,8 @@ DEFAULT_WEBAPP_RUNNER_VERSION="7.0.57.2"
 installGrails()
 {
   local grailsVersion=${1:-${DEFAULT_GRAILS_VERSION}}
-  local grailsUrl="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/grails-${grailsVersion}.zip"
+  #local grailsUrl="http://dist.springframework.org.s3.amazonaws.com/release/GRAILS/grails-${grailsVersion}.zip"
+  local grailsUrl="https://github.com/grails/grails-core/releases/download/v${grailsVersion}/grails-${grailsVersion}.zip"
 
   if [ ! -d ${GRAILS_TEST_CACHE}/${grailsVersion}/.grails ]; then
     mkdir -p ${GRAILS_TEST_CACHE}/${grailsVersion}
