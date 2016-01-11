@@ -143,6 +143,24 @@ testCompile_Version_2_0_0()
   assertTrue "Cache directory should have been created" "[ -d ${CACHE_DIR}/.grails_cache ]"
 }
 
+testCompile_VersionWithAltURL()
+{
+  local grailsVersion="2.5.3"
+  createGrailsApp ${grailsVersion}
+  assertTrue  "Precondition: application.properties should exist" "[ -f ${BUILD_DIR}/application.properties ]"
+  assertFalse "Precondition: Grails should not be installed" "[ -d ${CACHE_DIR}/.grails ]"
+
+  compile
+
+  assertCapturedSuccess
+  assertCaptured "Grails ${grailsVersion} app detected"
+  assertCaptured "Installing Grails ${grailsVersion}"
+  assertTrue "Grails should have been installed" "[ -d ${CACHE_DIR}/.grails ]"
+  assertEquals "Correct Grails version should have been installed" "${grailsVersion}" "$(getInstalledGrailsVersion)"
+  assertCaptured "Grails non-1.3.7 apps should specify -plain-output flag" "grails  -plain-output -Divy.default.ivy.user.dir=${CACHE_DIR} war"
+  assertTrue "Cache directory should have been created" "[ -d ${CACHE_DIR}/.grails_cache ]"
+}
+
 testCompile_With_Wrapper() {
   local grailsVersion="2.1.0"
   createGrailsAppWithWrapper ${grailsVersion}
