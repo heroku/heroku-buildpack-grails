@@ -11,7 +11,7 @@ config_vars:
   PATH: .jdk/bin:.sbt_home/bin:/usr/local/bin:/usr/bin:/bin
   JAVA_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
 addons:
-  heroku-postgresql:dev
+  heroku-postgresql
 EOF`
 
   release
@@ -31,7 +31,7 @@ config_vars:
   PATH: .jdk/bin:.sbt_home/bin:/usr/local/bin:/usr/bin:/bin
   JAVA_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
 addons:
-  heroku-postgresql:dev
+  heroku-postgresql
 
 default_process_types:
   web:      java \\$JAVA_OPTS -jar DEFAULT_RUNNER.JAR \\$RUNNER_OPTS --port \\$PORT target/*.war
