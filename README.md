@@ -2,6 +2,8 @@
 
 This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for building and deploying Grails apps on Heroku.
 
+# [Grails 2 support is deprecated](https://kb.heroku.com/grails-2-x-is-deprecated-with-support-ending-june-1-2017) and ending on June 1, 2017. For Grails 3, please see the documentation for [Deploying Gradle Apps on Heroku](https://devcenter.heroku.com/articles/deploying-gradle-apps-on-heroku), as Grails 3 and onward use Gradle as their packaging mechanism.
+
 ## Usage
 
 Create a Git repository for a Grails 1.3.7 or 2.0 app:
