@@ -1,5 +1,7 @@
 # Heroku buildpack: Grails [![Build Status](https://travis-ci.org/heroku/heroku-buildpack-grails.svg?branch=master)](https://travis-ci.org/heroku/heroku-buildpack-grails)
 
+![](https://cloud.githubusercontent.com/assets/51578/11048146/2e0d0a3e-8704-11e5-9f87-79df54f313cc.jpg)
+
 This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for building and deploying Grails apps on Heroku.
 
 # [Grails 2 support is deprecated](https://kb.heroku.com/grails-2-x-is-deprecated-with-support-ending-june-1-2017) and ending on June 1, 2017. For Grails 3, please see the documentation for [Deploying Gradle Apps on Heroku](https://devcenter.heroku.com/articles/deploying-gradle-apps-on-heroku), as Grails 3 and onward use Gradle as their packaging mechanism.
